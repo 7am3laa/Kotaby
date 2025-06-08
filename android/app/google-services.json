@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "835674285322",
+    "project_id": "kotaby-67a9b",
+    "storage_bucket": "kotaby-67a9b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835674285322:android:e29038027b80e37bc146f3",
+        "android_client_info": {
+          "package_name": "com.example.kotaby"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVFBTuYJhkr2HhcB3pnSBopnl6wjDwVP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
