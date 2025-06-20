@@ -6,7 +6,7 @@ import 'package:kotaby/core/models/upload_record_model.dart';
 
 class UplaodRecordService {
   final Dio _dio = Dio();
-  final String _url = 'https://test6-0b77677-v1.app.beam.cloud';
+  final String _url = 'https://test9-a775a1e-v1.app.beam.cloud/';
   final String _token =
       'MH9eOBlNHZkV8U8iuOj8mEE1WGdPbHKowFnG3TsG0aAmAqQTs6IeIFlB-GjN9JEz9l7OHaCTqI77Lsb5c3BlYw==';
 

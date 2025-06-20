@@ -16,12 +16,12 @@ import 'package:quran/reciters.dart';
 import 'package:quran/surah_data.dart';
 
 class SurahPageScreen extends StatelessWidget {
-  final int pageNumber;
+  int pageNumber;
   final bool shouldHighlightText;
   final String highlightVerse;
   final int? lastp;
 
-  const SurahPageScreen({
+  SurahPageScreen({
     super.key,
     required this.pageNumber,
     required this.shouldHighlightText,
@@ -41,6 +41,7 @@ class SurahPageScreen extends StatelessWidget {
       child: _SurahPageContent(
         shouldHighlightText,
         highlightVerse,
+        pageNumber,
         lastp,
       ),
     );
@@ -50,10 +51,12 @@ class SurahPageScreen extends StatelessWidget {
 class _SurahPageContent extends StatefulWidget {
   final bool shouldHighlight;
   final String verse;
+  int pageNumber;
   final int? lastp;
-  const _SurahPageContent(
+  _SurahPageContent(
     this.shouldHighlight,
     this.verse,
+    this.pageNumber,
     this.lastp,
   );
 
@@ -145,7 +148,10 @@ class _SurahPageContentState extends State<_SurahPageContent> {
               },
             ),
             controller: state.pageController,
-            onPageChanged: context.read<SurahPageCubit>().updatePage,
+            onPageChanged: (int newPage) {
+              print(newPage);
+              context.read<SurahPageCubit>().updatePage(newPage);
+            },
             itemCount: state.lastPage ?? totalPagesCount + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
@@ -160,7 +166,14 @@ class _SurahPageContentState extends State<_SurahPageContent> {
                 slivers: [
                   _buildAppBar(index, context, isWidth),
                   SliverToBoxAdapter(
-                    child: _buildVerseContent(index, state, context, isWidth),
+                    child: _buildVerseContent(
+                        index,
+                        state.pageController.page == null
+                            ? 1
+                            : state.pageController.page!.toInt(),
+                        state,
+                        context,
+                        isWidth),
                   ),
                 ],
               );
@@ -270,8 +283,8 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     );
   }
 
-  Widget _buildVerseContent(
-      int index, SurahPageState state, BuildContext context, bool isWidth) {
+  Widget _buildVerseContent(int index, int pageNumber, SurahPageState state,
+      BuildContext context, bool isWidth) {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: isWidth ? 15 : 4.67),
@@ -280,8 +293,8 @@ class _SurahPageContentState extends State<_SurahPageContent> {
           textDirection: TextDirection.rtl,
           text: TextSpan(
             children: getPageData(index)
-                .expand(
-                    (e) => _buildVerseSpans(e, index, state, context, isWidth))
+                .expand((e) => _buildVerseSpans(
+                    e, index, state, context, isWidth, pageNumber))
                 .toList(),
           ),
         ),
@@ -289,8 +302,13 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     );
   }
 
-  List<InlineSpan> _buildVerseSpans(Map<String, dynamic> e, int index,
-      SurahPageState state, BuildContext context, bool isWidth) {
+  List<InlineSpan> _buildVerseSpans(
+      Map<String, dynamic> e,
+      int index,
+      SurahPageState state,
+      BuildContext context,
+      bool isWidth,
+      int pageNumber) {
     final cubit = context.read<SurahPageCubit>();
     final spans = <InlineSpan>[];
 
@@ -311,12 +329,14 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     }
 
     for (var i = e["start"]; i <= e["end"]; i++) {
-      spans.add(_buildVerseSpan(e, i, index, state, cubit, context, isWidth));
+      spans.add(_buildVerseSpan(
+          pageNumber, e, i, index, state, cubit, context, isWidth));
     }
     return spans;
   }
 
   TextSpan _buildVerseSpan(
+    int pageNumber,
     Map<String, dynamic> e,
     int i,
     int index,
@@ -336,7 +356,13 @@ class _SurahPageContentState extends State<_SurahPageContent> {
       recognizer: LongPressGestureRecognizer()
         ..onLongPress = () {
           cubit.selectVerse(e["surah"], i);
-          _showVerseOptions(context, e["surah"], i, index);
+          _showVerseOptions(
+            context,
+            pageNumber,
+            e["surah"],
+            i,
+            index,
+          );
         },
       text: verseText,
       style: TextStyle(
@@ -388,6 +414,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
 
   void _showVerseOptions(
     BuildContext context,
+    int pageNumber,
     int surah,
     int verse,
     int index,
@@ -438,6 +465,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => RecordAyatScreen(
+                              pageNumber: pageNumber,
                               surah: surah,
                               verse: verse,
                               ayaText: getVerseQCF(surah, verse),
