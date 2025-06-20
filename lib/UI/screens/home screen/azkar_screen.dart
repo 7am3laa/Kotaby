@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kotaby/UI/screens/main%20screen/main_screen.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
@@ -73,109 +74,119 @@ class _AzkarScreenState extends State<AzkarScreen> {
     final int currentCounter = currentZekr['counter'];
     final double progress = currentCounter / requiredCount;
 
-    return Scaffold(
-      backgroundColor: primaryColor,
-      appBar: CustomAppBar(title: widget.title),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: PageView.builder(
-          controller: _pageController,
-          itemCount: widget.azkarList.length,
-          physics: const NeverScrollableScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          reverse: true,
-          itemBuilder: (context, index) {
-            final zekr = widget.azkarList[index];
-            final int requiredCount = int.tryParse(zekr['count']) ?? 1;
-            final int currentCounter = zekr['counter'];
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => MainScreen()),
+          (route) => false,
+        );
+        return false; // معناها احنا اتحكمنا في الرجوع
+      },
+      child: Scaffold(
+        backgroundColor: primaryColor,
+        appBar: CustomAppBar(title: widget.title),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: widget.azkarList.length,
+            physics: const NeverScrollableScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            reverse: true,
+            itemBuilder: (context, index) {
+              final zekr = widget.azkarList[index];
+              final int requiredCount = int.tryParse(zekr['count']) ?? 1;
+              final int currentCounter = zekr['counter'];
 
-            return SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: CustomText(
-                          text: '${index + 1} / ${widget.azkarList.length}',
-                          fontSize: 18,
-                          color: Colors.white70,
+              return SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: CustomText(
+                            text: '${index + 1} / ${widget.azkarList.length}',
+                            fontSize: 18,
+                            color: Colors.white70,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CustomText(
-                            text: "${zekr['zekr'].replaceAll('.', '')}",
-                            textAlign: TextAlign.center,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            textDirection: TextDirection.rtl,
-                          ),
-                          const SizedBox(height: 10),
-                          CustomText(
-                            text: zekr['description'] != null
-                                ? "${zekr['description'].replaceAll('.', '')}"
-                                : '',
-                            textAlign: TextAlign.center,
-                            color: Colors.white.withOpacity(0.6),
-                            fontWeight: FontWeight.w200,
-                            textDirection: TextDirection.rtl,
-                          ),
-                          const SizedBox(height: 15),
-                        ],
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CustomText(
+                              text: "${zekr['zekr'].replaceAll('.', '')}",
+                              textAlign: TextAlign.center,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              textDirection: TextDirection.rtl,
+                            ),
+                            const SizedBox(height: 10),
+                            CustomText(
+                              text: zekr['description'] != null
+                                  ? "${zekr['description'].replaceAll('.', '')}"
+                                  : '',
+                              textAlign: TextAlign.center,
+                              color: Colors.white.withOpacity(0.6),
+                              fontWeight: FontWeight.w200,
+                              textDirection: TextDirection.rtl,
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(top: 10, bottom: 50),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 100,
-              height: 100,
-              child: CircularProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.white24,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                strokeWidth: 6,
-              ),
-            ),
-            GestureDetector(
-              onTap: currentCounter < requiredCount
-                  ? () => _incrementCounter(currentPage)
-                  : null,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: currentCounter < requiredCount ? bColor : Colors.green,
-                ),
-                alignment: Alignment.center,
-                child: CustomText(
-                  text: currentCounter < requiredCount
-                      ? '${requiredCount - currentCounter}'
-                      : 'أتممت',
-                  color: Colors.white,
-                  fontSize: 24,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(top: 10, bottom: 50),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.white24,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  strokeWidth: 6,
                 ),
               ),
-            ),
-          ],
+              GestureDetector(
+                onTap: currentCounter < requiredCount
+                    ? () => _incrementCounter(currentPage)
+                    : null,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:
+                        currentCounter < requiredCount ? bColor : Colors.green,
+                  ),
+                  alignment: Alignment.center,
+                  child: CustomText(
+                    text: currentCounter < requiredCount
+                        ? '${requiredCount - currentCounter}'
+                        : 'أتممت',
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -8,6 +8,8 @@ import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_state
 import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/functions/snake_bar.dart';
 import 'package:kotaby/core/models/users_model.dart';
+import 'package:kotaby/core/services/streak_service.dart';
+import 'package:kotaby/core/services/tasks_service.dart';
 import 'package:kotaby/core/services/user_auth_services.dart';
 import 'package:kotaby/storage.dart';
 
@@ -69,7 +71,22 @@ class LoginCubit extends Cubit<LoginState> {
             password: _currentUser!.password,
           ),
           Storage.saveUserImage(_currentUser!.image!),
+          Storage.saveSurahAndVerse(
+            _currentUser!.lastSurah == 0 ? 1 : _currentUser!.lastSurah,
+            _currentUser!.lastAyah == 0 ? 1 : _currentUser!.lastAyah,
+          ),
         ]);
+        final streakService = StreakService();
+        final taskspaln = TasksService();
+        final r = await streakService.getStreak();
+        await Storage.saveCurrentStreak(r.currentStreak);
+        await Storage.saveLongestStreak(r.maxStreak);
+
+        final t = await taskspaln.getTaskSummary();
+        if (t.totalTasks != 0) {
+          await Storage.saveTaskPlanState(1);
+          await Storage.saveCompletionPercentage(t.completionPercentage);
+        }
         emit(LoginSuccess("مرحبًا ${_currentUser!.userName}"));
         emit(LoginPasswordVisibilityToggled(true));
 
@@ -82,8 +99,6 @@ class LoginCubit extends Cubit<LoginState> {
       emit(LoginFailure("فشل تسجيل الدخول: ${e.toString()}"));
     }
   }
-
- 
 
   Future<void> uploadProfilePicture(BuildContext context) async {
     try {
@@ -134,8 +149,6 @@ class LoginCubit extends Cubit<LoginState> {
       );
     }
   }
-
-
 
   Future<void> logout(BuildContext context) async {
     emit(UserLoggingOut());

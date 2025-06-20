@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:kotaby/core/functions/snake_bar.dart';
+import 'package:kotaby/core/services/streak_service.dart';
+import 'package:kotaby/core/services/user_auth_services.dart';
 import 'package:kotaby/main.dart';
 import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
@@ -173,7 +175,7 @@ class SurahPageCubit extends Cubit<SurahPageState> {
       await audioHandler.setPlaylist(
         urls: getAudioURLSurah(surah, Storage.reciterId),
         name: getSurahNameArabicFull(surah),
-        verse: verse-1,
+        verse: verse,
         surahNumber: surah,
       );
 
@@ -215,8 +217,14 @@ class SurahPageCubit extends Cubit<SurahPageState> {
   }
 
   void bookMark(int surah, int verse, BuildContext context) async {
+    final streakService = StreakService();
+    final userApi = UserAuthServices();
     try {
-      await Storage.saveSurahAndVerse(surah, verse);
+      await streakService.updateStreak(lastSurah: surah, lastAyah: verse);
+      final user = await userApi.getUserById(userId: Storage.useridCached);
+      await Storage.saveSurahAndVerse(user.lastSurah, user.lastAyah);
+  
+
       if (context.mounted) {
         customSnakeBar(
           context: context,

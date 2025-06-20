@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kotaby/UI/screens/surah%20screen/cubit/surah_page_cubit/surah_page_cubit.dart';
 import 'package:kotaby/UI/screens/surah%20screen/record_ayat_screen.dart';
 import 'package:kotaby/core/functions/navigate.dart';
+import 'package:kotaby/core/services/streak_service.dart';
 import 'package:kotaby/core/ui_components/basmallah.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/core/ui_components/header_widget.dart';
@@ -71,6 +72,25 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   String se = "";
   Timer? highlightTimer;
 
+  void updateStreak() async {
+    final streakService = StreakService();
+    final r = await streakService.getStreak();
+
+    final now = DateTime.now();
+    final lastReadDate = DateTime.parse(r.lastRead);
+
+    if (!(now.year == lastReadDate.year &&
+        now.month == lastReadDate.month &&
+        now.day == lastReadDate.day)) {
+      await streakService.updateStreak(
+        lastSurah: Storage.surahNumber,
+        lastAyah: Storage.verseNumber,
+      );
+      await Storage.saveCurrentStreak(r.currentStreak);
+      await Storage.saveLongestStreak(r.maxStreak);
+    }
+  }
+
   void changColor() {
     if (Storage.colorid == 0) {
       setState(() {
@@ -90,6 +110,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   void initState() {
     startHighlightAnimation();
     changColor();
+    updateStreak();
     super.initState();
   }
 
@@ -149,6 +170,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
             ),
             controller: state.pageController,
             onPageChanged: (int newPage) {
+              updateStreak();
               print(newPage);
               context.read<SurahPageCubit>().updatePage(newPage);
             },
@@ -397,18 +419,16 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   double _calculateFontSize(int index, bool isWidth) {
     if (index == 1 || index == 2) {
       return isWidth ? 21.8.sp : 29.5.sp;
-    } else if (index == 145 || index == 201) {
-      return 22.4.sp;
     } else if (index == 0) {
       return 23.1.sp;
     } else if (index == 50 || index == 54 || index == 78 || index == 96) {
       return isWidth ? 18.9.sp : 23.9.sp;
     } else if (index == 526) {
       return isWidth ? 18.9.sp : 24.3.sp;
-    } else if (index == 51) {
-      return isWidth ? 18.9.sp : 24.2.sp;
+    } else if (index == 600) {
+      return isWidth ? 18.9 : 23.9.sp;
     } else {
-      return isWidth ? 18.9.sp : 23.9.sp;
+      return isWidth ? 18.9.sp : 24.sp;
     }
   }
 
@@ -559,12 +579,12 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     return Column(
       children: [
         Card(
-          color: textColor,
+          color: const Color.fromARGB(255, 91, 62, 29),
           child: IconButton(
             onPressed: onTap,
             icon: Icon(icon),
             iconSize: 25.w,
-            color: color,
+            color: Colors.white,
           ),
         ),
         CustomText(

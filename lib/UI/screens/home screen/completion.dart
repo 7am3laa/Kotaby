@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kotaby/UI/screens/home%20screen/completion_list.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
+import 'package:kotaby/core/services/tasks_service.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/notfications_service.dart';
@@ -17,33 +18,16 @@ class Completion extends StatefulWidget {
 class _CompletionState extends State<Completion> {
   final int totalQuranPages = 604;
   int selectedDays = 30;
-  int pagesPerDay = 0;
+
   bool isLoading = false;
+  final tasksService = TasksService();
 
   @override
   void initState() {
     super.initState();
-    calculateReadingPlan();
   }
 
-  void calculateReadingPlan() {
-    if (selectedDays <= 0) {
-      setState(() {
-        pagesPerDay = totalQuranPages;
-      });
-      return;
-    }
-
-    setState(() {
-      pagesPerDay = (totalQuranPages / selectedDays).ceil();
-      // Ensure we don't exceed total pages
-      if (pagesPerDay * selectedDays > totalQuranPages) {
-        pagesPerDay = (totalQuranPages / selectedDays).floor();
-      }
-    });
-  }
-
-  Future<void> saveCompletionPlan() async {
+  Future<void> saveCompletionPlan({required int days}) async {
     if (isLoading) return;
 
     setState(() {
@@ -51,53 +35,20 @@ class _CompletionState extends State<Completion> {
     });
 
     try {
-      // Validate the plan
-      if (selectedDays <= 0 || pagesPerDay <= 0) {
-        throw Exception('Invalid reading plan parameters');
-      }
-
-      // Save basic plan data
-      await Storage.saveCompletionDays(selectedDays);
-      await Storage.saveCompletionPages(pagesPerDay);
-
-      // Generate and save completion list
-      List<int> completionList = [];
-      int remainingPages = totalQuranPages;
-      int currentPage = 1;
-
-      for (int i = 0; i < selectedDays; i++) {
-        if (remainingPages <= 0) break;
-
-        int pagesForToday =
-            (i == selectedDays - 1) ? remainingPages : pagesPerDay;
-
-        completionList.add(currentPage);
-        currentPage += pagesForToday;
-        remainingPages -= pagesForToday;
-      }
-
-      await Storage.saveCompletionList(completionList);
+      final tasks = await tasksService.createTasks(days: days);
+      await Storage.saveTaskPlanState(1);
+      await N.pushReplacementto(context: context, screen: CompletionList());
       await NotificationsService.scheduleWerdDailyNotification();
-
-      if (mounted) {
-        N.pushReplacementto(context: context, screen: const CompletionList());
+      await Storage.saveWerdDaily(true);
+      for (var task in tasks) {
+        print('Task ${task.dayNumber}: ${task.surahRange}');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error saving plan: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
+      print('Failed to create tasks');
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -145,21 +96,21 @@ class _CompletionState extends State<Completion> {
                           color: Colors.white.withOpacity(.8),
                           fontSize: 18,
                         ),
-                        CustomText(
-                          text: 'Pages per day: $pagesPerDay',
-                          color: Colors.white.withOpacity(.8),
-                          fontSize: 18,
-                        ),
-                        if (pagesPerDay * selectedDays > totalQuranPages)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: CustomText(
-                              text:
-                                  'Note: Plan will complete before selected days',
-                              color: Colors.orange,
-                              fontSize: 14,
-                            ),
-                          ),
+                        // CustomText(
+                        //   text: 'Pages per day: $pagesPerDay',
+                        //   color: Colors.white.withOpacity(.8),
+                        //   fontSize: 18,
+                        // ),
+                        // if (pagesPerDay * selectedDays > totalQuranPages)
+                        //   Padding(
+                        //     padding: const EdgeInsets.only(top: 8.0),
+                        //     child: CustomText(
+                        //       text:
+                        //           'Note: Plan will complete before selected days',
+                        //       color: Colors.orange,
+                        //       fontSize: 14,
+                        //     ),
+                        //   ),
                       ],
                     ),
                   ),
@@ -183,7 +134,6 @@ class _CompletionState extends State<Completion> {
                   onChanged: (value) {
                     setState(() {
                       selectedDays = value.toInt();
-                      calculateReadingPlan();
                     });
                   },
                 ),
@@ -202,7 +152,9 @@ class _CompletionState extends State<Completion> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: bColor,
-        onPressed: saveCompletionPlan,
+        onPressed: () {
+          saveCompletionPlan(days: selectedDays);
+        },
         child: const Icon(Icons.save_outlined),
       ),
     );

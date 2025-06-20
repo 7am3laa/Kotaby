@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
-import 'package:kotaby/core/ui_components/custom_search_icon.dart';
 import 'package:kotaby/UI/screens/hadith screen/models/hadith_model.dart';
 import 'package:kotaby/UI/screens/hadith screen/services/hadith_api_service.dart';
-import 'package:file_picker/file_picker.dart';
 
 class HadithScreen extends StatefulWidget {
   const HadithScreen({super.key});
@@ -27,11 +25,6 @@ class _HadithScreenState extends State<HadithScreen> {
       appBar: CustomAppBar(
         title: "بحث الحديث",
         islead: false,
-        actions: [
-          CustomSearchIcon(
-            onPressed: () => _searchHadith(),
-          ),
-        ],
       ),
       body: Directionality(
         textDirection: TextDirection.rtl,
@@ -45,7 +38,7 @@ class _HadithScreenState extends State<HadithScreen> {
                 SizedBox(height: 10),
                 TextField(
                   controller: _searchController,
-                  maxLines: 10,
+                  maxLines: 5,
                   textAlign: TextAlign.right,
                   decoration: InputDecoration(
                     hintText: 'ادخل نص الحديث للبحث عنه...',

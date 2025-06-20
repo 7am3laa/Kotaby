@@ -1,9 +1,9 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:kotaby/UI/screens/auth%20screen/auth_screen.dart';
 import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_cubit.dart';
 import 'package:kotaby/UI/screens/auth%20screen/cubits/signup%20cubit/signup_cubit.dart';
@@ -17,15 +17,22 @@ import 'package:kotaby/notfications_service.dart';
 import 'package:kotaby/storage.dart';
 
 late AudioPlayerHandler audioHandler;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationsService.initialize();
-  SystemChrome.setPreferredOrientations(
-    [
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ],
-  );
+  await Storage.init();
+
+  ReceivedAction? initialAction = await AwesomeNotifications()
+      .getInitialNotificationAction(removeFromActionEvents: true);
+
+  String? initialType = initialAction?.payload?['type'];
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandler(),
@@ -35,12 +42,14 @@ Future<void> main() async {
       androidNotificationOngoing: true,
     ),
   );
-  await Storage.init();
-  runApp(MyApp());
+
+  runApp(MyApp(initialNotificationType: initialType));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? initialNotificationType;
+
+  const MyApp({super.key, this.initialNotificationType});
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +57,6 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => LoginCubit()),
         BlocProvider(create: (context) => SignupCubit()),
-
-        // BlocProvider(create: (context) => AllSurahCubit()),
         BlocProvider(create: (context) => UpdateInfoCubit()),
         BlocProvider(create: (context) => NotificationCubit()),
         BlocProvider(create: (context) => ContactUsCubit()),
@@ -58,16 +65,29 @@ class MyApp extends StatelessWidget {
         designSize: const Size(392.72727272727275, 800.7272727272727),
         minTextAdapt: true,
         splitScreenMode: true,
-        child: GetMaterialApp(
+        child: MaterialApp(
+          navigatorKey: NotificationsService.navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Kotaby',
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
             useMaterial3: false,
           ),
-          home: Storage.isLoggedIn ? MainScreen() : AuthScreen(),
+          home: Storage.isLoggedIn
+              ? _handleInitialNotificationOrMainScreen(initialNotificationType)
+              : const AuthScreen(),
         ),
       ),
     );
+  }
+
+  Widget _handleInitialNotificationOrMainScreen(String? type) {
+    if (type == null) return MainScreen();
+
+    Future.delayed(Duration.zero, () {
+      NotificationsService.navigateToTargetScreen(type);
+    });
+
+    return MainScreen();
   }
 }

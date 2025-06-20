@@ -28,7 +28,6 @@ class _RadioScreenState extends State<RadioScreen> {
   late StreamSubscription _mediaItemSubscription;
 
   final ScrollController _scrollController = ScrollController();
-  final double _radioItemHeight = 80;
 
   @override
   void initState() {

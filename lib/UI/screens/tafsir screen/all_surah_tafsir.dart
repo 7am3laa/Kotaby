@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:kotaby/UI/screens/tafsir%20screen/tafsir_screen.dart';
 import 'package:kotaby/constants/constants.dart';
+import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
-import 'package:kotaby/core/ui_components/custom_search_icon.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:quran/quran.dart';
 import 'package:quran/surah_data.dart';
@@ -20,11 +19,6 @@ class AllSurahTafsir extends StatelessWidget {
       appBar: CustomAppBar(
         title: "التفسير",
         islead: false,
-        actions: [
-          CustomSearchIcon(
-            onPressed: () => print("Search button tafisr Screen pressed"),
-          ),
-        ],
       ),
       body: ListView.builder(
         shrinkWrap: true,
@@ -81,8 +75,9 @@ class AllSurahTafsir extends StatelessWidget {
                 fontSize: isWidth ? 10 : 20,
               ),
               onTap: () {
-                Get.to(
-                  () => TafsirScreen(
+                N.pushto(
+                  context: context,
+                  screen: TafsirScreen(
                     suranumber: surahNumber,
                   ),
                 );

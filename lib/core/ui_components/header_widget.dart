@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 
-import 'package:quran/quran.dart';
 
 class HeaderWidget extends StatelessWidget {
   var e;

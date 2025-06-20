@@ -34,7 +34,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.searchController,
     this.bottom,
     this.isDrawer = false,
-    this.fontFamily = "Hafs",
+    this.fontFamily = "Poppins",
   });
 
   @override
@@ -51,12 +51,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         text: title,
         color: Colors.white,
         fontWeight: FontWeight.w600,
-        fontFamily: fontFamily,
+        fontFamily: title == "Kotaby - كُتّابي" ? "Hafs" : fontFamily,
         fontSize: (width > 500 && width < 750)
             ? 17
             : width >= 750
                 ? 10
-                : 20,
+                : 23,
       ),
       leading: islead
           ? IconButton(

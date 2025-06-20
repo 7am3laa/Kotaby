@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kotaby/UI/screens/surah%20screen/surah_page_screen.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
-import 'package:kotaby/core/models/completion_model.dart';
-import 'package:kotaby/core/services/completion_service.dart';
+import 'package:kotaby/core/models/task_model.dart';
+import 'package:kotaby/core/services/tasks_service.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/notfications_service.dart';
@@ -18,8 +18,9 @@ class CompletionList extends StatefulWidget {
 }
 
 class _CompletionListState extends State<CompletionList> {
-  List<CompletionItem> _items = [];
-  bool _isLoading = true;
+  List<TaskModel> _items = [];
+  bool _isLoading = false;
+  final taskService = TasksService();
 
   @override
   void initState() {
@@ -28,15 +29,19 @@ class _CompletionListState extends State<CompletionList> {
   }
 
   Future<void> _loadItems() async {
-    setState(() => _isLoading = true);
-    _items = await CompletionService.getCompletionItems();
-    setState(() => _isLoading = false);
-  }
-
-  Future<void> _markAsRead(CompletionItem item) async {
-    await CompletionService.markAsRead(item);
-    // Update completion percentage after marking as read
-    await _loadItems(); // Reload items to update UI
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      _items = await taskService.getUserTasks();
+    } catch (e) {
+      print('Error fetching tasks: $e');
+    }
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _showDeleteConfirmation() async {
@@ -66,8 +71,13 @@ class _CompletionListState extends State<CompletionList> {
           ),
           TextButton(
             onPressed: () async {
-              await CompletionService.clearAll();
+              await taskService.deleteUserTasks();
+              await Storage.saveTaskPlanState(0);
               NotificationsService.cancelNotificationById(60);
+              await Storage.saveWerdDaily(false);
+              final peren = await taskService.getTaskSummary();
+              await Storage.saveCompletionPercentage(
+                  peren.completionPercentage);
               if (mounted) {
                 Navigator.pop(context);
                 N.pop(context: context);
@@ -82,6 +92,33 @@ class _CompletionListState extends State<CompletionList> {
         ],
       ),
     );
+  }
+
+  Future<void> _markAsRead(TaskModel item) async {
+    try {
+      if (!item.completed) {
+        await taskService.completeTask(item.id);
+      }
+      final updatedItem = TaskModel(
+        id: item.id,
+        userId: item.userId,
+        dayNumber: item.dayNumber,
+        startPage: item.startPage,
+        endPage: item.endPage,
+        taskDate: item.taskDate,
+        progress: item.progress,
+        surahRange: item.surahRange,
+        completed: true,
+      );
+      setState(() {
+        _items[_items.indexWhere((t) => t.id == item.id)] = updatedItem;
+      });
+      final peren = await taskService.getTaskSummary();
+      await Storage.saveCompletionPercentage(peren.completionPercentage);
+      print(peren.completionPercentage);
+    } catch (e) {
+      print('Error marking as read: $e');
+    }
   }
 
   @override
@@ -127,7 +164,7 @@ class _CompletionListState extends State<CompletionList> {
 }
 
 class _CompletionItemWidget extends StatelessWidget {
-  final CompletionItem item;
+  final TaskModel item;
   final VoidCallback onMarkAsRead;
 
   const _CompletionItemWidget({
@@ -147,7 +184,7 @@ class _CompletionItemWidget extends StatelessWidget {
           screen: SurahPageScreen(
             pageNumber: item.startPage,
             shouldHighlightText: true,
-            highlightVerse: "$suarhNumber:$ayaNumber",
+            highlightVerse: "${suarhNumber}:${ayaNumber}",
             lastp: item.endPage + 1,
           ),
         );
@@ -155,7 +192,7 @@ class _CompletionItemWidget extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: item.isRead
+          color: item.completed
               ? Colors.green.withOpacity(0.2)
               : Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
@@ -172,7 +209,7 @@ class _CompletionItemWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: item.isRead
+                color: item.completed
                     ? Colors.green.withOpacity(0.3)
                     : bColor.withOpacity(0.2),
                 borderRadius: const BorderRadius.vertical(
@@ -182,7 +219,7 @@ class _CompletionItemWidget extends StatelessWidget {
               child: Row(
                 children: [
                   CustomText(
-                    text: 'Day ${item.dayIndex + 1}',
+                    text: 'Day ${item.dayNumber}',
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -195,14 +232,14 @@ class _CompletionItemWidget extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: item.isRead ? null : onMarkAsRead,
+                    onPressed: item.completed ? null : onMarkAsRead,
                     icon: Icon(
-                      item.isRead
+                      item.completed
                           ? Icons.check_circle
                           : Icons.check_circle_outline,
                       size: 20,
                     ),
-                    color: item.isRead ? Colors.green : Colors.white70,
+                    color: item.completed ? Colors.green : Colors.white70,
                   ),
                 ],
               ),

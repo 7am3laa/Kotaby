@@ -34,13 +34,13 @@ class StorageScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildSectionTitle("Network Usage", isWideScreen),
+                _buildSectionTitle("Network information", isWideScreen),
                 const SizedBox(height: 10),
                 _buildInfoContainer([
                   _buildInfoRow("Network Type", state.networkType),
-                  const SizedBox(height: 8),
-                  _buildInfoRow(
-                      "Internet Usage", formatSize(state.internetUsage)),
+                  // const SizedBox(height: 8),
+                  // _buildInfoRow(
+                  //     "Internet Usage", formatSize(state.internetUsage)),
                 ]),
                 const SizedBox(height: 30),
                 _buildSectionTitle("Storage Information", isWideScreen),

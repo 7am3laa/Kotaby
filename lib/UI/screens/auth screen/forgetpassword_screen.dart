@@ -6,7 +6,6 @@ import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
-import 'package:kotaby/core/ui_components/custom_text_field.dart';
 
 class ForgetpasswordScreen extends StatelessWidget {
   const ForgetpasswordScreen({super.key});

@@ -111,22 +111,6 @@ class AudioPlayerHandler extends BaseAudioHandler
     }
   }
 
-  void _updateCurrentMediaItem(int? index) {
-    if (index != null && index >= 0 && index < _mediaItems.length) {
-      final currentItem = _mediaItems[index];
-      if (_audioPlayer.duration != null) {
-        final updatedItem = currentItem.copyWith(
-          duration: _audioPlayer.duration,
-        );
-        mediaItem.add(updatedItem);
-      } else {
-        mediaItem.add(currentItem);
-      }
-    } else if (_mediaItems.isEmpty) {
-      mediaItem.add(null);
-    }
-  }
-
   List<MediaControl> _getControls() {
     final controls = <MediaControl>[];
 
@@ -261,7 +245,7 @@ class AudioPlayerHandler extends BaseAudioHandler
       final audioSources = <AudioSource>[];
       _mediaItems.clear();
 
-      for (int i = verse; i < urls.length; i++) {
+      for (int i = 0; i < urls.length; i++) {
         final url = urls[i];
         final fileName = url.split('/').last;
 
@@ -298,22 +282,9 @@ class AudioPlayerHandler extends BaseAudioHandler
       final playlist = ConcatenatingAudioSource(children: audioSources);
       await _audioPlayer.setAudioSource(playlist);
 
-      _audioPlayer.durationStream.listen((duration) {
-        if (duration != null) {
-          final currentIndex = _audioPlayer.currentIndex;
-          if (currentIndex != null &&
-              currentIndex >= 0 &&
-              currentIndex < _mediaItems.length) {
-            final currentItem = _mediaItems[currentIndex];
-            final updatedItem = currentItem.copyWith(
-              duration: duration,
-            );
-            mediaItem.add(updatedItem);
-          }
-        }
-      });
+      await _audioPlayer.seek(Duration.zero, index: verse - 1);
 
-      _updateCurrentMediaItem(_audioPlayer.currentIndex);
+      _updateVerseHighlight(surahNumber, verse);
 
       _currentIndexSubscription?.cancel();
       _currentIndexSubscription =
@@ -321,10 +292,10 @@ class AudioPlayerHandler extends BaseAudioHandler
         if (index == null) return;
 
         try {
-          _updateVerseHighlight(surahNumber, verse);
+          _updateVerseHighlight(surahNumber, index + 1);
 
           if (Storage.isAutoDownload) {
-            final currentUrl = urls[verse + index];
+            final currentUrl = urls[index];
             final fileName = currentUrl.split('/').last;
             final localPath =
                 await AudioDownloader.getLocalPath(fileName, Storage.reciterId);
@@ -351,7 +322,6 @@ class AudioPlayerHandler extends BaseAudioHandler
         }
       });
 
-      _updateVerseHighlight(surahNumber, verse + 1);
       await _audioPlayer.play();
 
       print('Playlist set successfully with ${urls.length - verse} verses');

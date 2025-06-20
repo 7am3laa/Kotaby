@@ -7,6 +7,7 @@ import 'package:kotaby/UI/screens/home%20screen/widgets/progress_container.dart'
 import 'package:kotaby/UI/screens/home%20screen/widgets/streak_container.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
+import 'package:kotaby/core/services/streak_service.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/storage.dart';
@@ -19,6 +20,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final streakService = StreakService();
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -45,12 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               StreakContainer(
                 title: "Current Streak",
-                numOfDays: 10,
+                numOfDays: Storage.currentStreak,
                 width: width,
               ),
               StreakContainer(
                 title: "Longest Streak",
-                numOfDays: 10,
+                numOfDays: Storage.longestStreak,
                 width: width,
               ),
             ],
@@ -104,12 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ProgressContainer(
           icon: "assets/images/icons/icon4.png",
           title: "Completion",
-          percentage:
-              "${((Storage.completionPageForPercentage / 604) * 100).toStringAsFixed(0)}%",
+          percentage: Storage.planedTask == 1
+              ? "${(Storage.completionPageForPercentage).toStringAsFixed(0)}%"
+              : "no plan",
           width: width,
           height: height,
           onTap: () async {
-            if (Storage.completionDays == 0) {
+            if (Storage.planedTask == 0) {
               await N.pushto(context: context, screen: const Completion());
             } else {
               await N.pushto(context: context, screen: const CompletionList());

@@ -77,7 +77,7 @@ class LoginScreen extends StatelessWidget {
                 isVisible: loginCubit.isVisiblePassword,
                 validator: (value) => passwordValidation(value: value),
                 toggleVisibility: loginCubit.togglePasswordVisibility,
-                isLogin: true,
+
                 // onTap: () => loginCubit.forgetPassword(context),
                 isWidth: isWidth,
               ),

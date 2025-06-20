@@ -1,7 +1,6 @@
 import 'dart:typed_data';
-
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:kotaby/UI/screens/home%20screen/azkar_screen.dart';
 import 'package:kotaby/UI/screens/home%20screen/completion_list.dart';
 import 'package:kotaby/UI/screens/main%20screen/main_screen.dart';
@@ -11,7 +10,6 @@ import 'package:kotaby/constants/azkar_elsabah.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 
 class NotificationsService {
   static final NotificationsService _instance =
@@ -22,6 +20,9 @@ class NotificationsService {
   }
 
   NotificationsService._internal();
+
+  /// Global navigator key
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   static Future<void> initialize() async {
     await AwesomeNotifications().initialize(
@@ -62,89 +63,75 @@ class NotificationsService {
     if (action.payload != null) {
       final type = action.payload!['type'];
 
-      // First navigate to main screen
-      Get.offAll(() => MainScreen());
+      // 1. Navigate to main screen
+      navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => MainScreen()),
+        (route) => true,
+      );
 
-      // Add a small delay to ensure the main screen is loaded
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Then navigate to the target screen
-      _navigateToTargetScreen(type);
+      navigateToTargetScreen(type);
     }
   }
 
-  static void _navigateToTargetScreen(String? type) {
+  static void navigateToTargetScreen(String? type) {
+    if (type == null) return;
+
+    Widget? target;
+
     switch (type) {
       case 'Surah El Baqraa':
-        Get.offAll(
-          () => SurahPageScreen(
-            pageNumber: 2,
-            shouldHighlightText: true,
-            highlightVerse: getVerse(2, 1),
-          ),
+        target = SurahPageScreen(
+          pageNumber: 2,
+          shouldHighlightText: true,
+          highlightVerse: getVerse(2, 1),
         );
         break;
 
       case 'Surah El Mulek':
-        Get.offAll(
-          () => SurahPageScreen(
-            pageNumber: 562,
-            shouldHighlightText: true,
-            highlightVerse: getVerse(67, 1),
-          ),
+        target = SurahPageScreen(
+          pageNumber: 562,
+          shouldHighlightText: true,
+          highlightVerse: getVerse(67, 1),
         );
         break;
 
       case 'Surah El Kahf':
-        Get.offAll(
-          () => SurahPageScreen(
-            pageNumber: 293,
-            shouldHighlightText: true,
-            highlightVerse: getVerse(18, 1),
-          ),
+        target = SurahPageScreen(
+          pageNumber: 293,
+          shouldHighlightText: true,
+          highlightVerse: getVerse(18, 1),
         );
         break;
 
       case 'Morning Azkar':
-        print('Morning azkar notification tapped');
-        Get.offAll(
-          () => AzkarScreen(
-            azkarList: azkarElsabah,
-            title: 'أذكار الصباح',
-          ),
+        target = AzkarScreen(
+          azkarList: azkarElsabah,
+          title: 'أذكار الصباح',
         );
         break;
 
       case 'Evening Azkar':
-        Get.offAll(
-          () => AzkarScreen(
-            azkarList: azkarElmassa,
-            title: 'أذكار المساء',
-          ),
+        target = AzkarScreen(
+          azkarList: azkarElmassa,
+          title: 'أذكار المساء',
         );
         break;
 
       case 'werd_daily':
-        Get.offAll(() => CompletionList());
+        target = CompletionList();
         break;
 
       default:
         print('Unknown notification type: $type');
+        return;
     }
-  }
 
-  static Future<void> onNotificationTapAlternative(
-      ReceivedAction action) async {
-    if (action.payload != null) {
-      final type = action.payload!['type'];
-
-      Get.offAll(() => MainScreen());
-
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      _navigateToTargetScreen(type);
+    navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (_) => target!),
+    );
     }
-  }
+
+  // SCHEDULED NOTIFICATIONS BELOW
 
   static Future<void> scheduleAzkarElsabahNotification() async {
     final time = Storage.azkarSabatTime;
@@ -164,13 +151,6 @@ class NotificationsService {
         millisecond: 0,
         repeats: true,
       ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'READ_NOW',
-          label: 'اقرأ الآن',
-          actionType: ActionType.Default,
-        ),
-      ],
     );
   }
 
@@ -192,13 +172,6 @@ class NotificationsService {
         millisecond: 0,
         repeats: true,
       ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'READ_NOW',
-          label: 'اقرأ الآن',
-          actionType: ActionType.Default,
-        ),
-      ],
     );
   }
 
@@ -220,13 +193,6 @@ class NotificationsService {
         millisecond: 0,
         repeats: true,
       ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'READ_NOW',
-          label: 'اقرأ الآن',
-          actionType: ActionType.Default,
-        ),
-      ],
     );
   }
 
@@ -248,13 +214,6 @@ class NotificationsService {
         millisecond: 0,
         repeats: true,
       ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'READ_NOW',
-          label: 'اقرأ الآن',
-          actionType: ActionType.Default,
-        ),
-      ],
     );
   }
 
@@ -277,13 +236,6 @@ class NotificationsService {
         millisecond: 0,
         repeats: true,
       ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'READ_NOW',
-          label: 'اقرأ الآن',
-          actionType: ActionType.Default,
-        ),
-      ],
     );
   }
 
@@ -305,13 +257,6 @@ class NotificationsService {
         millisecond: 0,
         repeats: true,
       ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'READ_NOW',
-          label: 'اقرأ الآن',
-          actionType: ActionType.Default,
-        ),
-      ],
     );
   }
 

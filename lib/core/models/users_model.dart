@@ -6,6 +6,8 @@ class UsersModel {
   final String? image; // جعلها nullable
   final DateTime? dateOfBirth;
   final String? nationality;
+  final int lastSurah;
+  final int lastAyah;
 
   UsersModel({
     required this.id,
@@ -15,20 +17,23 @@ class UsersModel {
     this.image,
     this.dateOfBirth,
     this.nationality,
+    required this.lastSurah,
+    required this.lastAyah,
   });
 
   factory UsersModel.fromJson(Map<String, dynamic> json) {
     return UsersModel(
-      id: json['id'],
-      userName: json['userName'],
-      password: json['password'],
-      email: json['email'],
-      image: json['image'], // قد تكون null
-      dateOfBirth: json['dateOfBirth'] != null 
-          ? DateTime.parse(json['dateOfBirth']) 
-          : null,
-      nationality: json['nationality'],
-    );
+        id: json['id'],
+        userName: json['userName'],
+        password: json['password'],
+        email: json['email'],
+        image: json['image'], // قد تكون null
+        dateOfBirth: json['dateOfBirth'] != null
+            ? DateTime.parse(json['dateOfBirth'])
+            : null,
+        nationality: json['nationality'],
+        lastSurah: json["lastSurah"],
+        lastAyah: json["lastAyah"]);
   }
 
   UsersModel copyWith({
@@ -48,6 +53,8 @@ class UsersModel {
       image: image ?? this.image,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       nationality: nationality ?? this.nationality,
+      lastSurah: lastSurah,
+      lastAyah: lastAyah,
     );
   }
 }

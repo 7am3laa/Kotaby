@@ -38,11 +38,14 @@ class Storage {
   static TimeOfDay surahAlmulkTime = TimeOfDay(hour: 21, minute: 30);
   static TimeOfDay dailyWerdTime = TimeOfDay(hour: 16, minute: 00);
 
-  static int completionDays = 0;
+  static int planedTask = 0;
   static int completionPages = 0;
-  static int completionPageForPercentage = 0;
+  static double completionPageForPercentage = 0;
   static List<int> completionList = [];
   static List<int> readPages = [];
+
+  static int currentStreak = 1;
+  static int longestStreak = 1;
 
   static Future<void> init() async {
     await getLoginState();
@@ -64,22 +67,46 @@ class Storage {
     await getSurahAlmulkTime();
     await getSurahAlkahfTime();
     await getDailyWerdTime();
-    await getCompletionDays();
+    await getTaskPlanState();
     await getCompletionPages();
     await getCompletionPercentage();
     await getCompletionList();
     await getReadPages();
+    await getCurrentStreak();
+    await getLongestStreak();
   }
 
-  static Future<void> saveCompletionDays(int days) async {
+  static Future<void> saveLongestStreak(int longestS) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('completionDays', days);
-    completionDays = days;
+    await prefs.setInt('longestStreak', longestS);
+    longestStreak = longestS;
   }
 
-  static Future<void> getCompletionDays() async {
+  static Future<void> getLongestStreak() async {
     final prefs = await SharedPreferences.getInstance();
-    completionDays = prefs.getInt('completionDays') ?? 0;
+    longestStreak = prefs.getInt('longestStreak') ?? 1;
+  }
+
+  static Future<void> saveCurrentStreak(int currentS) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('currentStreak', currentS);
+    currentStreak = currentS;
+  }
+
+  static Future<void> getCurrentStreak() async {
+    final prefs = await SharedPreferences.getInstance();
+    currentStreak = prefs.getInt('currentStreak') ?? 1;
+  }
+
+  static Future<void> saveTaskPlanState(int state) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('planedTask', state);
+    planedTask = state;
+  }
+
+  static Future<void> getTaskPlanState() async {
+    final prefs = await SharedPreferences.getInstance();
+    planedTask = prefs.getInt('planedTask') ?? 0;
   }
 
   static Future<void> saveWerdDaily(bool value) async {
@@ -105,15 +132,15 @@ class Storage {
     print("completionPages: $completionPages");
   }
 
-  static Future<void> saveCompletionPercentage(int percentage) async {
+  static Future<void> saveCompletionPercentage(double percentage) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('completionPercentage', percentage);
+    await prefs.setDouble('completionPercentage', percentage);
     completionPageForPercentage = percentage;
   }
 
   static Future<void> getCompletionPercentage() async {
     final prefs = await SharedPreferences.getInstance();
-    completionPageForPercentage = prefs.getInt('completionPercentage') ?? 0;
+    completionPageForPercentage = prefs.getDouble('completionPercentage') ?? 0;
   }
 
   static Future<void> saveCompletionList(List<int> list) async {
@@ -152,23 +179,10 @@ class Storage {
     await prefs.remove('completionDays');
     await prefs.remove('completionPages');
     await prefs.remove('completionPercentage');
-    await prefs.remove('completionList');
-    await prefs.remove('readPages');
-    completionDays = 0;
-    completionPages = 0;
-    completionPageForPercentage = 0;
-    completionList = [];
-    readPages = [];
-    await saveCompletionDays(0);
-    await saveCompletionPages(0);
+
+    await saveTaskPlanState(0);
+
     await saveCompletionPercentage(0);
-    await saveCompletionList([]);
-    await saveReadPages([]);
-    await getCompletionDays();
-    await getCompletionPages();
-    await getCompletionPercentage();
-    await getCompletionList();
-    await getReadPages();
   }
 
   static Future<void> saveAzkarElsabah(bool azkarElsabah) async {
@@ -493,10 +507,18 @@ class Storage {
     await prefs.remove("surahAlbaqarahTime");
     await prefs.remove("surahAlkahfTime");
     await prefs.remove("surahAlmulkTime");
+    await prefs.remove("currentStreak");
+    await prefs.remove("longestStreak");
+    await prefs.remove("surah");
+    await prefs.remove("verse");
     await clearAllCompletion();
     await clearUserImage();
     usernameCached = '';
     useridCached = 0;
+    currentStreak = 1;
+    longestStreak = 1;
+    surahNumber = 1;
+    verseNumber = 1;
     userEmailCached = '';
     userPasswordCached = '';
     isAzkarElsabah = false;

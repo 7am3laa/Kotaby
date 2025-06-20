@@ -1,6 +1,5 @@
-import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:kotaby/core/models/users_model.dart';
 
 class QuranDataService {
   final Dio dio = Dio();

@@ -47,7 +47,6 @@ dependencies:
   turn_page_transition: ^0.4.0
   cached_network_image: ^3.4.1
   permission_handler: ^12.0.0+1
-  get: ^4.7.2
   connectivity_plus: ^6.1.3
   dio: ^5.8.0+1
   path_provider: ^2.1.5

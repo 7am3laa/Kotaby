@@ -4,12 +4,9 @@ import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/services/quran_data_service.dart';
 import 'package:kotaby/core/services/uplaod_record_service.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
-import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/main.dart';
-import 'package:kotaby/storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:quran/quran.dart';
 import 'package:record/record.dart';
 
 String _toArabicNumerals(int number) {

@@ -73,7 +73,7 @@ class UserAuthServices {
           "email": email,
         },
       );
-      return _handleResponse(response); 
+      return _handleResponse(response);
     } on DioException catch (e) {
       _handleDioError(e, "Update");
       return null;
@@ -112,7 +112,7 @@ class UserAuthServices {
         'file': await MultipartFile.fromFile(imageFile.path),
       });
 
-      final response = await dio.put(
+      final response = await dio.post(
         '${_baseUrl}users/$userId/photo',
         data: formData,
         options: Options(

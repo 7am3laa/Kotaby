@@ -7,7 +7,7 @@ import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
 
-class BookmarkContainer extends StatelessWidget {
+class BookmarkContainer extends StatefulWidget {
   final double width;
   final double height;
 
@@ -17,6 +17,11 @@ class BookmarkContainer extends StatelessWidget {
     required this.height,
   });
 
+  @override
+  State<BookmarkContainer> createState() => _BookmarkContainerState();
+}
+
+class _BookmarkContainerState extends State<BookmarkContainer> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -29,9 +34,10 @@ class BookmarkContainer extends StatelessWidget {
             pageNumber: getPageNumber(Storage.surahNumber, Storage.verseNumber),
           ),
         );
+        setState(() {});
       },
       child: Container(
-        height: (width > 500 && height > 750) ? 100.w : 150.w,
+        height: (widget.width > 500 && widget.height > 750) ? 100.w : 150.w,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [sColor, bColor],
@@ -56,14 +62,14 @@ class BookmarkContainer extends StatelessWidget {
                         Icon(
                           Icons.menu_book_rounded,
                           color: Colors.white,
-                          size: width > 500 ? 20.w : 24.w,
+                          size: widget.width > 500 ? 20.w : 24.w,
                         ),
                         CustomText(
                           text: "Last Read",
                           color: Colors.white,
-                          fontSize: (width > 500 && width < 750)
+                          fontSize: (widget.width > 500 && widget.width < 750)
                               ? 14
-                              : width >= 750
+                              : widget.width >= 750
                                   ? 10
                                   : 18,
                         ),
@@ -74,9 +80,9 @@ class BookmarkContainer extends StatelessWidget {
                       text: getSurahName(Storage.surahNumber),
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: (width > 500 && width < 750)
+                      fontSize: (widget.width > 500 && widget.width < 750)
                           ? 14
-                          : width >= 750
+                          : widget.width >= 750
                               ? 10
                               : 18,
                     ),
@@ -84,9 +90,9 @@ class BookmarkContainer extends StatelessWidget {
                     CustomText(
                       text: "Ayah No : ${Storage.verseNumber}",
                       color: Colors.white.withOpacity(.8),
-                      fontSize: (width > 500 && width < 750)
+                      fontSize: (widget.width > 500 && widget.width < 750)
                           ? 14
-                          : width >= 750
+                          : widget.width >= 750
                               ? 10
                               : 18,
                     ),
@@ -99,9 +105,9 @@ class BookmarkContainer extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 child: Image.asset(
                   "assets/images/quran.png",
-                  width: (width > 500 && width < 750)
+                  width: (widget.width > 500 && widget.width < 750)
                       ? 150.w
-                      : width >= 750
+                      : widget.width >= 750
                           ? 100.w
                           : 200.w,
                   fit: BoxFit.fitHeight,
