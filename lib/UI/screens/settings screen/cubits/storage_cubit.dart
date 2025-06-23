@@ -86,8 +86,7 @@ class StorageCubit extends Cubit<StorageState> {
 
   void updateInternetUsage(double bytes) {
     final currentUsage = state.internetUsage;
-    final newUsage =
-        currentUsage + (bytes / (1024 * 1024)); // Convert bytes to MB
+    final newUsage = currentUsage + (bytes / (1024 * 1024));
     emit(state.copyWith(internetUsage: newUsage));
   }
 

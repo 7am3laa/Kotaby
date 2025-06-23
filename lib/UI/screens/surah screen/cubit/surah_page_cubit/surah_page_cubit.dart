@@ -102,7 +102,8 @@ class SurahPageCubit extends Cubit<SurahPageState> {
     }
   }
 
-  Future<void> playVerse(int surah, int verse, BuildContext context) async {
+  Future<void> playVerse(
+      int surah, int verse, BuildContext context, int repeatCount) async {
     _safeNavigatorPop(context);
     try {
       if (!await _checkConnectivity()) {
@@ -116,6 +117,7 @@ class SurahPageCubit extends Cubit<SurahPageState> {
         url: getAudioURLByVerse(surah, verse, Storage.reciterId),
         surah: surah,
         verse: verse,
+        repeatCount: repeatCount,
       );
 
       await _playbackSubscription?.cancel();
@@ -223,7 +225,10 @@ class SurahPageCubit extends Cubit<SurahPageState> {
       await streakService.updateStreak(lastSurah: surah, lastAyah: verse);
       final user = await userApi.getUserById(userId: Storage.useridCached);
       await Storage.saveSurahAndVerse(user.lastSurah, user.lastAyah);
-  
+
+      final r = await streakService.getStreak();
+      await Storage.saveCurrentStreak(r.currentStreak);
+      await Storage.saveLongestStreak(r.maxStreak);
 
       if (context.mounted) {
         customSnakeBar(

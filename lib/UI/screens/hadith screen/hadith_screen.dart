@@ -4,6 +4,7 @@ import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
 import 'package:kotaby/UI/screens/hadith screen/models/hadith_model.dart';
 import 'package:kotaby/UI/screens/hadith screen/services/hadith_api_service.dart';
+import 'package:kotaby/core/ui_components/custom_text.dart';
 
 class HadithScreen extends StatefulWidget {
   const HadithScreen({super.key});
@@ -23,7 +24,7 @@ class _HadithScreenState extends State<HadithScreen> {
     return Scaffold(
       backgroundColor: primaryColor,
       appBar: CustomAppBar(
-        title: "بحث الحديث",
+        title: "الباحث الحديثي",
         islead: false,
       ),
       body: Directionality(
@@ -36,31 +37,73 @@ class _HadithScreenState extends State<HadithScreen> {
               spacing: 10,
               children: [
                 SizedBox(height: 10),
-                TextField(
-                  controller: _searchController,
-                  maxLines: 5,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    hintText: 'ادخل نص الحديث للبحث عنه...',
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: TextField(
+                    controller: _searchController,
+                    textAlign: TextAlign.right,
+                    decoration: InputDecoration(
+                      hintText: 'ادخل كلمات البحث...',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          _searchHadith();
+                        },
+                        icon: Icon(Icons.search),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.black,
+                          width: 1,
+                        ),
+                      ),
                     ),
+                    onSubmitted: (value) => _searchHadith(),
                   ),
-                  onSubmitted: (value) => _searchHadith(),
-                ),
-                CustomButton(
-                  buttonText: _isLoading ? "جاري البحث..." : "بحث",
-                  onPressed: _isLoading ? () {} : _searchHadith,
                 ),
 
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: CustomButton(
+                    buttonText: _isLoading ? "جاري البحث..." : "بحث",
+                    onPressed: _isLoading ? () {} : _searchHadith,
+                  ),
+                ),
+                if (_searchResults.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CustomText(
+                        text: "عدد النتائج :${_searchResults.length}",
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
                 // Loading indicator
                 if (_isLoading)
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        color: bColor,
+                      ),
                     ),
                   ),
 
@@ -320,7 +363,10 @@ class _HadithScreenState extends State<HadithScreen> {
     if (query.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('يرجى إدخال نص للبحث'),
+          content: Text(
+            'يرجى إدخال نص للبحث',
+            textAlign: TextAlign.right,
+          ),
           backgroundColor: Colors.orange,
         ),
       );

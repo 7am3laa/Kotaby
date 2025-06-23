@@ -6,6 +6,7 @@ import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/functions/to_arabic_number.dart';
 import 'package:kotaby/core/models/tafseer_author.dart';
 import 'package:kotaby/core/services/tafseer_api.dart';
+import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:quran/quran.dart';
 
 class TafsirScreen extends StatefulWidget {
@@ -22,9 +23,13 @@ class TafsirScreen extends StatefulWidget {
 
 class _TafsirScreenState extends State<TafsirScreen> {
   List<String> ayat = [];
+  List<String> ayatEN = [];
   List<TafseerAuthor> tafseerList = [];
   List<int> selectedTafsirIndices = [];
+  List<int> selectedTafsirIndicesEn = [];
+
   bool isLoading = true;
+  bool isReload = false;
 
   ApiServices apiServices = ApiServices();
   Set<int> loadingIndices = {};
@@ -39,10 +44,25 @@ class _TafsirScreenState extends State<TafsirScreen> {
     await Future.wait([
       loadAyat(),
       loadTafsirName(),
+      //    loadAyatEN(),
     ]);
     if (mounted) {
       setState(() {
         isLoading = false;
+      });
+    }
+  }
+
+  Future<void> loadAyatEN() async {
+    List<String> laodAyatEn = [];
+    for (int i = 1; i <= getVerseCount(widget.suranumber); i++) {
+      final verse = getVerseTranslation(widget.suranumber, i);
+      laodAyatEn.add("$verse ${i.toArabicNumbers}");
+    }
+    if (mounted) {
+      setState(() {
+        ayatEN = laodAyatEn;
+        selectedTafsirIndicesEn = List.generate(laodAyatEn.length, (_) => 0);
       });
     }
   }
@@ -70,6 +90,16 @@ class _TafsirScreenState extends State<TafsirScreen> {
     }
   }
 
+  Future<void> relaodTafsirName() async {
+    setState(() {
+      isReload = true;
+    });
+    await loadTafsirName();
+    setState(() {
+      isReload = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isWidth = MediaQuery.of(context).size.width > 500;
@@ -78,7 +108,7 @@ class _TafsirScreenState extends State<TafsirScreen> {
       return Scaffold(
         backgroundColor: primaryColor,
         body: const Center(
-          child: CircularProgressIndicator(color: Colors.white),
+          child: CircularProgressIndicator(color: bColor),
         ),
       );
     }
@@ -139,104 +169,132 @@ class _TafsirScreenState extends State<TafsirScreen> {
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                   ),
+                  // Text(
+                  //   ayatEN[index],
+                  //   style: TextStyle(
+                  //     color: Colors.white,
+                  //     fontWeight: FontWeight.w500,
+                  //     fontFamily: "Hafs",
+                  //     fontSize: isWidth ? 20 : 30,
+                  //   ),
+                  //   textAlign: TextAlign.right,
+                  //   textDirection: TextDirection.rtl,
+                  // ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.black87,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: DropdownButton<int>(
-                            value: selectedIndex,
-                            isExpanded: true,
-                            dropdownColor: Colors.black87,
-                            iconEnabledColor: Colors.white,
-                            underline: const SizedBox(),
-                            items: List.generate(tafseerList.length, (i) {
-                              return DropdownMenuItem<int>(
-                                value: i,
-                                child: Text(
-                                  tafseerList[i].name,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: isWidth ? 15 : 22,
-                                  ),
-                                  textAlign: TextAlign.right,
-                                  textDirection: TextDirection.rtl,
+                  tafseerList.isNotEmpty
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              );
-                            }),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  selectedTafsirIndices[index] = value;
-                                });
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      loadingIndices.contains(index)
-                          ? const SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : IconButton(
-                              onPressed: () async {
-                                setState(() {
-                                  loadingIndices.add(index);
-                                });
-
-                                try {
-                                  final tafsirAya =
-                                      await apiServices.getTafseerText(
-                                    tafseerList[selectedIndex].id,
-                                    widget.suranumber,
-                                    index + 1,
-                                  );
-
-                                  if (mounted) {
-                                    N.pushto(
-                                      context: context,
-                                      screen: TafsirTextScreen(
-                                        ayaNumber: index + 1,
-                                        surahName: getSurahNameArabic(
-                                            widget.suranumber),
-                                        tafsirAya: tafsirAya,
-                                        isE3rab: false,
+                                child: DropdownButton<int>(
+                                  value: selectedIndex,
+                                  isExpanded: true,
+                                  dropdownColor: Colors.black87,
+                                  iconEnabledColor: Colors.white,
+                                  underline: const SizedBox(),
+                                  items: List.generate(tafseerList.length, (i) {
+                                    return DropdownMenuItem<int>(
+                                      value: i,
+                                      child: Text(
+                                        tafseerList[i].name,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: isWidth ? 15 : 22,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                        textDirection: TextDirection.rtl,
                                       ),
                                     );
-                                  }
-                                } finally {
-                                  if (mounted) {
-                                    setState(() {
-                                      loadingIndices.remove(index);
-                                    });
-                                  }
-                                }
-                              },
-                              icon: const Icon(Icons.menu_book,
-                                  color: Colors.white),
+                                  }),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedTafsirIndices[index] = value;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                            const SizedBox(width: 12),
+                            loadingIndices.contains(index)
+                                ? const SizedBox(
+                                    width: 30,
+                                    height: 30,
+                                    child: CircularProgressIndicator(
+                                      color: bColor,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : IconButton(
+                                    onPressed: () async {
+                                      setState(() {
+                                        loadingIndices.add(index);
+                                      });
 
+                                      try {
+                                        final tafsirAya =
+                                            await apiServices.getTafseerText(
+                                          tafseerList[selectedIndex].id,
+                                          widget.suranumber,
+                                          index + 1,
+                                        );
+
+                                        if (mounted) {
+                                          N.pushto(
+                                            context: context,
+                                            screen: TafsirTextScreen(
+                                              ayaNumber: index + 1,
+                                              surahName: getSurahNameArabic(
+                                                  widget.suranumber),
+                                              tafsirAya: tafsirAya,
+                                              isE3rab: false,
+                                            ),
+                                          );
+                                        }
+                                      } finally {
+                                        if (mounted) {
+                                          setState(() {
+                                            loadingIndices.remove(index);
+                                          });
+                                        }
+                                      }
+                                    },
+                                    icon: const Icon(Icons.menu_book,
+                                        color: Colors.white),
+                                  ),
+                          ],
+                        )
+                      : ListTile(
+                          leading: IconButton(
+                            onPressed: () {
+                              relaodTafsirName();
+                            },
+                            icon: isReload
+                                ? CircularProgressIndicator(
+                                    color: bColor,
+                                  )
+                                : Icon(Icons.replay_outlined),
+                          ),
+                          title: CustomText(
+                            text: "للتفسير اتصل بالانترنت",
+                            color: primaryColor,
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                  const SizedBox(height: 12),
                   Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    color: Colors.black,
+                    color: primaryColor,
                     child: ListTile(
                       title: Center(
                         child: Text(

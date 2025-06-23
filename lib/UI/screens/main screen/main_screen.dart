@@ -18,9 +18,6 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   ApiServices apiServices = ApiServices();
 
-
-  
-
   void _updateIndex(int index) {
     setState(() {
       _currentIndex = index;

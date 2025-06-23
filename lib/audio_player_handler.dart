@@ -361,6 +361,7 @@ class AudioPlayerHandler extends BaseAudioHandler
     required String url,
     required int surah,
     required int verse,
+    required int repeatCount,
   }) async {
     try {
       _currentMode = PlaybackMode.singleVerse;
@@ -400,26 +401,48 @@ class AudioPlayerHandler extends BaseAudioHandler
       _mediaItems.add(mediaItem);
       this.mediaItem.add(mediaItem);
 
-      if (localPath != null) {
-        await _audioPlayer.setAudioSource(AudioSource.uri(Uri.file(localPath)));
-        print('Playing local file: $localPath');
-      } else {
-        await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
-        print('Playing remote URL: $url');
-      }
+      final source = localPath != null
+          ? AudioSource.uri(Uri.file(localPath))
+          : AudioSource.uri(Uri.parse(url));
 
       _audioPlayer.durationStream.listen((duration) {
         if (duration != null) {
-          final updatedItem = mediaItem.copyWith(
-            duration: duration,
-          );
+          final updatedItem = mediaItem.copyWith(duration: duration);
           this.mediaItem.add(updatedItem);
         }
       });
 
-      await play();
+      // 👇 التكرار الحقيقي
+      for (int i = 0; i < repeatCount; i++) {
+        print('🔁 تكرار ${i + 1} من $repeatCount');
+
+        await _audioPlayer.setAudioSource(source);
+        await _audioPlayer.play();
+
+        final duration = await _audioPlayer.durationStream.firstWhere(
+          (d) => d != null,
+          orElse: () => Duration.zero,
+        );
+
+        if (duration != Duration.zero) {
+          // ننتظر لحد ما التلاوة توصل للنهاية
+          await _audioPlayer.positionStream.firstWhere(
+            (position) =>
+                position >= duration! - const Duration(milliseconds: 200),
+          );
+        } else {
+          await _audioPlayer.playbackEventStream.firstWhere(
+            (event) => event.processingState == ProcessingState.completed,
+          );
+        }
+
+        await _audioPlayer.stop(); // نوقف بعد كل تكرار عشان نعيد من البداية
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+
+      _resetVerseHighlight();
     } catch (e) {
-      print('Failed to play verse $surah:$verse - $e');
+      print('❌ Failed to play verse $surah:$verse - $e');
       rethrow;
     }
   }

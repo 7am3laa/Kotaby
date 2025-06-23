@@ -522,6 +522,7 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text("🎧 إرسال"),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

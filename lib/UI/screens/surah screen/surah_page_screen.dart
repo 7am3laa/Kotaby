@@ -71,6 +71,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   bool isH = false;
   String se = "";
   Timer? highlightTimer;
+  final TextEditingController repeatController = TextEditingController();
 
   void updateStreak() async {
     final streakService = StreakService();
@@ -86,9 +87,15 @@ class _SurahPageContentState extends State<_SurahPageContent> {
         lastSurah: Storage.surahNumber,
         lastAyah: Storage.verseNumber,
       );
-      await Storage.saveCurrentStreak(r.currentStreak);
-      await Storage.saveLongestStreak(r.maxStreak);
     }
+  }
+
+  void getStreak() async {
+    final streakService = StreakService();
+
+    final r = await streakService.getStreak();
+    await Storage.saveCurrentStreak(r.currentStreak);
+    await Storage.saveLongestStreak(r.maxStreak);
   }
 
   void changColor() {
@@ -141,6 +148,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   @override
   void dispose() {
     highlightTimer?.cancel();
+    repeatController.dispose();
     super.dispose();
   }
 
@@ -172,6 +180,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
             onPageChanged: (int newPage) {
               updateStreak();
               print(newPage);
+              getStreak();
               context.read<SurahPageCubit>().updatePage(newPage);
             },
             itemCount: state.lastPage ?? totalPagesCount + 1,
@@ -425,6 +434,15 @@ class _SurahPageContentState extends State<_SurahPageContent> {
       return isWidth ? 18.9.sp : 23.9.sp;
     } else if (index == 526) {
       return isWidth ? 18.9.sp : 24.3.sp;
+    } else if (index == 578 ||
+        index == 577 ||
+        index == 575 ||
+        index == 574 ||
+        index == 569 ||
+        index == 568 ||
+        index == 567 ||
+        index == 566) {
+      return isWidth ? 18.9.sp : 23.8.sp;
     } else if (index == 600) {
       return isWidth ? 18.9 : 23.9.sp;
     } else {
@@ -442,130 +460,178 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     final cubit = context.read<SurahPageCubit>();
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: color,
-          border: Border.all(color: textColor, width: 3),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: 10.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildActionButton(
-                    icon: Icons.play_arrow,
-                    label: "تشغيل الآية",
-                    onTap: () => cubit.playVerse(surah, verse, context),
-                  ),
-                  SizedBox(
-                    width: 1.w,
-                    child: VerticalDivider(
-                      color: Colors.black,
-                      thickness: 1,
-                    ),
-                  ),
-                  _buildActionButton(
-                    icon: Icons.playlist_play,
-                    label: "تشغيل السورة",
-                    onTap: () => cubit.playSurah(surah, verse, context),
-                  ),
-                  _buildActionButton(
-                      icon: Icons.mic,
-                      label: "تسميع السورة",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecordAyatScreen(
-                              pageNumber: pageNumber,
-                              surah: surah,
-                              verse: verse,
-                              ayaText: getVerseQCF(surah, verse),
-                              fontFamily:
-                                  "QCF_P${index.toString().padLeft(3, "0")}",
-                            ),
-                          ),
-                        );
-                      }),
-                  _buildActionButton(
-                    icon: Icons.content_copy,
-                    label: "نسخ الآية",
-                    onTap: () => cubit.copyVerse(surah, verse, context),
-                  ),
-                  _buildActionButton(
-                    icon: Icons.bookmark_outline,
-                    label: "حفظ",
-                    onTap: () => cubit.bookMark(surah, verse, context),
-                  ),
-                ],
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color,
+            border: Border.all(color: textColor, width: 3),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
             ),
-            SizedBox(height: 10.h),
-            StatefulBuilder(
-              builder: (context, setState) => Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 10.h),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: PopupMenuButton<String>(
-                    color: color,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    position: PopupMenuPosition.under,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.w, vertical: 10.h),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: textColor),
-                        borderRadius: BorderRadius.circular(10),
+                  height: 80,
+                  child: ListView(
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildActionButton(
+                        icon: Icons.play_arrow,
+                        label: "تشغيل الآية",
+                        onTap: () => cubit.playVerse(surah, verse, context,
+                            int.tryParse(repeatController.text) ?? 1),
                       ),
-                      child: Text(
-                        Storage.reciterName,
-                        style: TextStyle(color: textColor),
-                        textAlign: TextAlign.right,
-                        textDirection: TextDirection.rtl,
+                      _buildActionButton(
+                        icon: Icons.playlist_play,
+                        label: "تشغيل السورة",
+                        onTap: () => cubit.playSurah(surah, verse, context),
                       ),
-                    ),
-                    itemBuilder: (context) => reciters.map((reciter) {
-                      return PopupMenuItem<String>(
-                        value: reciter['identifier'],
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            reciter['name'],
-                            style: TextStyle(color: textColor),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    onSelected: (value) async {
-                      final selectedReciter = reciters.firstWhere(
-                        (reciter) => reciter['identifier'] == value,
-                      );
-                      await Storage.saveReciterInfo(
-                        selectedReciter['name'],
-                        value,
-                      );
-                      await Storage.loadReciterInfo();
-                      setState(() {
-                        Storage.reciterId = value;
-                        Storage.reciterName = selectedReciter['name'];
-                      });
-                    },
+                      _buildActionButton(
+                          icon: Icons.mic,
+                          label: "تسميع السورة",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RecordAyatScreen(
+                                  pageNumber: pageNumber,
+                                  surah: surah,
+                                  verse: verse,
+                                  ayaText: getVerseQCF(surah, verse),
+                                  fontFamily:
+                                      "QCF_P${index.toString().padLeft(3, "0")}",
+                                ),
+                              ),
+                            );
+                          }),
+                      _buildActionButton(
+                        icon: Icons.content_copy,
+                        label: "نسخ الآية",
+                        onTap: () => cubit.copyVerse(surah, verse, context),
+                      ),
+                      _buildActionButton(
+                        icon: Icons.bookmark_outline,
+                        label: "حفظ",
+                        onTap: () => cubit.bookMark(surah, verse, context),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 20.h),
-          ],
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0.w),
+                child: TextField(
+                  controller: repeatController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: "عدد مرات تكرار الايه",
+
+                    hintStyle: TextStyle(color: Colors.grey[600], fontSize: 15),
+                    suffixIcon: Icon(Icons.repeat, color: textColor),
+                    filled: true,
+                    //  fillColor: Colors.grey[100],
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 20),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: textColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: textColor,
+                        width: 2,
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: textColor,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
+              StatefulBuilder(
+                builder: (context, setState) => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: PopupMenuButton<String>(
+                      color: color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      position: PopupMenuPosition.under,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 10.h),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: textColor),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          Storage.reciterName,
+                          style: TextStyle(color: textColor),
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ),
+                      itemBuilder: (context) => reciters.map((reciter) {
+                        return PopupMenuItem<String>(
+                          value: reciter['identifier'],
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              reciter['name'],
+                              style: TextStyle(color: textColor),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onSelected: (value) async {
+                        final selectedReciter = reciters.firstWhere(
+                          (reciter) => reciter['identifier'] == value,
+                        );
+                        await Storage.saveReciterInfo(
+                          selectedReciter['name'],
+                          value,
+                        );
+                        await Storage.loadReciterInfo();
+                        setState(() {
+                          Storage.reciterId = value;
+                          Storage.reciterName = selectedReciter['name'];
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.h),
+            ],
+          ),
         ),
       ),
     );
@@ -576,23 +642,26 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     required String label,
     required VoidCallback onTap,
   }) {
-    return Column(
-      children: [
-        Card(
-          color: const Color.fromARGB(255, 91, 62, 29),
-          child: IconButton(
-            onPressed: onTap,
-            icon: Icon(icon),
-            iconSize: 25.w,
-            color: Colors.white,
+    return Padding(
+      padding: const EdgeInsets.only(right: 5),
+      child: Column(
+        children: [
+          Card(
+            color: const Color.fromARGB(255, 91, 62, 29),
+            child: IconButton(
+              onPressed: onTap,
+              icon: Icon(icon),
+              iconSize: 25.w,
+              color: Colors.white,
+            ),
           ),
-        ),
-        CustomText(
-          text: label,
-          fontSize: 13,
-          color: textColor,
-        ),
-      ],
+          CustomText(
+            text: label,
+            fontSize: 13,
+            color: textColor,
+          ),
+        ],
+      ),
     );
   }
 }
