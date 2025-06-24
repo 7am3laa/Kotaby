@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_cubit.dart';
 import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_state.dart';
+import 'package:kotaby/UI/screens/auth%20screen/forgetpassword_screen.dart';
 import 'package:kotaby/UI/screens/main%20screen/main_screen.dart';
 import 'package:kotaby/core/functions/customs_fields.dart';
+import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/functions/snake_bar.dart';
 import 'package:kotaby/core/functions/validation.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
@@ -77,8 +79,9 @@ class LoginScreen extends StatelessWidget {
                 isVisible: loginCubit.isVisiblePassword,
                 validator: (value) => passwordValidation(value: value),
                 toggleVisibility: loginCubit.togglePasswordVisibility,
-
-                // onTap: () => loginCubit.forgetPassword(context),
+                isLogin: true,
+                onTap: () =>
+                    N.pushto(context: context, screen: ForgetpasswordScreen()),
                 isWidth: isWidth,
               ),
               const SizedBox(height: 30),

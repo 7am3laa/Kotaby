@@ -103,6 +103,36 @@ class UserAuthServices {
     }
   }
 
+  Future<void> forgetPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await dio.post(
+        '${_baseUrl}users/reset-password',
+        data: {
+          "email": email,
+          "password": password,
+        },
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print(response.data);
+        return response.data;
+      } else {
+        throw Exception("Reset failed: ${response.statusMessage}");
+      }
+    } on DioException catch (e) {
+      _handleDioError(e, "Reset Password");
+      return;
+    }
+  }
+
   Future<void> putProfilePic({
     required int userId,
     required File imageFile,
@@ -158,6 +188,8 @@ class UserAuthServices {
   void _handleDioError(DioException e, String operation) {
     final errorMessage =
         e.response?.data?['message'] ?? e.message ?? 'Unknown $operation error';
-    print("$operation Error: $errorMessage");
+    if (errorMessage == "The connection errored") {
+      print("$operation Error: $errorMessage");
+    }
   }
 }

@@ -49,6 +49,10 @@ class LoginPasswordVisibilityToggled extends LoginState {
   final bool isVisible;
   LoginPasswordVisibilityToggled(this.isVisible);
 }
+class LoginPasswordVisibilityToggledForget extends LoginState {
+  final bool isVisible;
+  LoginPasswordVisibilityToggledForget(this.isVisible);
+}
 
 class ForgetPasswordSuccess extends LoginState {}
 
@@ -60,3 +64,9 @@ class ForgetPasswordError extends LoginState {
   @override
   String toString() => 'ForgetPasswordError: $error';
 }
+
+class ForgetPasswordEmailNotFound extends LoginState {}
+
+class ForgetPasswordEmailFound extends LoginState {}
+
+class ForgetPasswordLoading extends LoginState {}

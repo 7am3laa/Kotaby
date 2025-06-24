@@ -40,7 +40,7 @@ class Storage {
 
   static int planedTask = 0;
   static int completionPages = 0;
-  static double completionPageForPercentage = 0;
+  static double completionPageForPercentage = 0.0;
   static List<int> completionList = [];
   static List<int> readPages = [];
 

@@ -16,18 +16,18 @@ import 'package:kotaby/storage.dart';
 class LoginCubit extends Cubit<LoginState> {
   final UserAuthServices _authServices;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> updateFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formForgetKey = GlobalKey<FormState>();
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController updateEmailController = TextEditingController();
-  final TextEditingController updatePasswordController =
-      TextEditingController();
-  final TextEditingController updateNameController = TextEditingController();
 
-  final TextEditingController checkPasswordController = TextEditingController();
+  final TextEditingController emailForgetPassword = TextEditingController();
+  final TextEditingController passworForget = TextEditingController();
 
   UsersModel? _currentUser;
   bool isVisiblePassword = true;
+  bool isVForget = true;
+  bool isEmailFound = false;
 
   UsersModel? get currentUser => _currentUser;
 
@@ -38,6 +38,11 @@ class LoginCubit extends Cubit<LoginState> {
   void togglePasswordVisibility() {
     isVisiblePassword = !isVisiblePassword;
     emit(LoginPasswordVisibilityToggled(isVisiblePassword));
+  }
+
+  void togglePasswordVisibilityForget() {
+    isVForget = !isVForget;
+    emit(LoginPasswordVisibilityToggledForget(isVForget));
   }
 
   Future<void> loginUser({
@@ -150,13 +155,69 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  Future<void> forgetPassword(BuildContext context) async {
+    if (!formForgetKey.currentState!.validate()) return;
+    emit(ForgetPasswordLoading());
+    try {
+      final users = await _authServices.getUsers();
+      for (var user in users) {
+        if (user.email == emailForgetPassword.text.trim()) {
+          isEmailFound = true;
+          emit(ForgetPasswordEmailFound());
+          return;
+        }
+      }
+
+      isEmailFound = false;
+      emit(ForgetPasswordEmailNotFound());
+    } catch (e) {
+      isEmailFound = false;
+      emit(ForgetPasswordError(e.toString()));
+    }
+  }
+
+  Future<void> resetPassword(BuildContext context) async {
+    if (passworForget.text.trim().isEmpty) {
+      emit(ForgetPasswordError("Password cannot be empty"));
+      return;
+    }
+
+    emit(ForgetPasswordLoading());
+
+    try {
+      await _authServices.forgetPassword(
+        email: emailForgetPassword.text.trim(),
+        password: passworForget.text.trim(),
+      );
+
+      emit(ForgetPasswordSuccess());
+
+      Future.delayed(
+        const Duration(milliseconds: 500),
+        () {
+          resetForgetPasswordState();
+          N.pop(context: context);
+        },
+      );
+    } catch (e) {
+      emit(ForgetPasswordError(e.toString()));
+    }
+  }
+
+  void resetForgetPasswordState() {
+    isEmailFound = false;
+    isVForget = true;
+    emailForgetPassword.clear();
+    passworForget.clear();
+    emit(LoginInitial()); 
+  }
+
   Future<void> logout(BuildContext context) async {
     emit(UserLoggingOut());
     try {
       await Storage.saveLoginState(false);
       await Storage.clearCachedUserData();
       _currentUser = null;
-
       emit(UserLoguted());
       N.pushAndRemoveUntil(context: context, screen: const AuthScreen());
     } catch (e) {

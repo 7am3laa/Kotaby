@@ -364,8 +364,10 @@ class AudioPlayerHandler extends BaseAudioHandler
     required int repeatCount,
   }) async {
     try {
-      _currentMode = PlaybackMode.singleVerse;
+      _currentIndexSubscription?.cancel();
 
+      _currentMode = PlaybackMode.singleVerse;
+      _updateVerseHighlight(surah, verse);
       String fileName = url.split('/').last;
       String? localPath;
 
@@ -412,20 +414,17 @@ class AudioPlayerHandler extends BaseAudioHandler
         }
       });
 
-      // 👇 التكرار الحقيقي
       for (int i = 0; i < repeatCount; i++) {
-        print('🔁 تكرار ${i + 1} من $repeatCount');
+        print(' تكرار ${i + 1} من $repeatCount');
 
         await _audioPlayer.setAudioSource(source);
         await _audioPlayer.play();
-
         final duration = await _audioPlayer.durationStream.firstWhere(
           (d) => d != null,
           orElse: () => Duration.zero,
         );
 
         if (duration != Duration.zero) {
-          // ننتظر لحد ما التلاوة توصل للنهاية
           await _audioPlayer.positionStream.firstWhere(
             (position) =>
                 position >= duration! - const Duration(milliseconds: 200),
@@ -436,9 +435,12 @@ class AudioPlayerHandler extends BaseAudioHandler
           );
         }
 
-        await _audioPlayer.stop(); // نوقف بعد كل تكرار عشان نعيد من البداية
+        await _audioPlayer.stop();
+        _currentIndexSubscription?.cancel;
+        _updateVerseHighlight(surah, verse);
         await Future.delayed(const Duration(milliseconds: 300));
       }
+      _currentIndexSubscription?.cancel();
 
       _resetVerseHighlight();
     } catch (e) {
