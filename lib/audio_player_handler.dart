@@ -365,9 +365,14 @@ class AudioPlayerHandler extends BaseAudioHandler
   }) async {
     try {
       _currentIndexSubscription?.cancel();
+      await _audioPlayer.stop();
 
       _currentMode = PlaybackMode.singleVerse;
+
+      _resetVerseHighlight();
+
       _updateVerseHighlight(surah, verse);
+
       String fileName = url.split('/').last;
       String? localPath;
 
@@ -407,10 +412,12 @@ class AudioPlayerHandler extends BaseAudioHandler
           ? AudioSource.uri(Uri.file(localPath))
           : AudioSource.uri(Uri.parse(url));
 
-      _audioPlayer.durationStream.listen((duration) {
+      StreamSubscription<Duration?>? durationSubscription;
+      durationSubscription = _audioPlayer.durationStream.listen((duration) {
         if (duration != null) {
           final updatedItem = mediaItem.copyWith(duration: duration);
           this.mediaItem.add(updatedItem);
+          durationSubscription?.cancel();
         }
       });
 
@@ -418,33 +425,157 @@ class AudioPlayerHandler extends BaseAudioHandler
         print(' تكرار ${i + 1} من $repeatCount');
 
         await _audioPlayer.setAudioSource(source);
+
+        _updateVerseHighlight(surah, verse);
+
         await _audioPlayer.play();
-        final duration = await _audioPlayer.durationStream.firstWhere(
-          (d) => d != null,
-          orElse: () => Duration.zero,
+
+        await _audioPlayer.playbackEventStream.firstWhere(
+          (event) => event.processingState == ProcessingState.completed,
         );
 
-        if (duration != Duration.zero) {
-          await _audioPlayer.positionStream.firstWhere(
-            (position) =>
-                position >= duration! - const Duration(milliseconds: 200),
-          );
-        } else {
-          await _audioPlayer.playbackEventStream.firstWhere(
-            (event) => event.processingState == ProcessingState.completed,
-          );
-        }
-
         await _audioPlayer.stop();
-        _currentIndexSubscription?.cancel;
-        _updateVerseHighlight(surah, verse);
-        await Future.delayed(const Duration(milliseconds: 300));
+
+        if (i < repeatCount - 1) {
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
       }
+
       _currentIndexSubscription?.cancel();
+      durationSubscription.cancel();
 
       _resetVerseHighlight();
     } catch (e) {
-      print('❌ Failed to play verse $surah:$verse - $e');
+      print('Failed to play verse $surah:$verse - $e');
+      _resetVerseHighlight();
+      rethrow;
+    }
+  }
+
+  Future<void> playVerseRange({
+    required int surah,
+    required int startVerse,
+    required int endVerse,
+    required int repeatCount,
+  }) async {
+    try {
+      if (startVerse > endVerse) {
+        throw ArgumentError('Start verse cannot be greater than end verse');
+      }
+
+      if (startVerse < 1 || endVerse > getVerseCount(surah)) {
+        throw ArgumentError('Invalid verse range for surah $surah');
+      }
+
+      _currentIndexSubscription?.cancel();
+      await _audioPlayer.stop();
+
+      _currentMode = PlaybackMode.verseRange;
+
+      _resetVerseHighlight();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      _updateVerseHighlight(surah, startVerse);
+
+      print(
+          'Playing verse range: $surah:$startVerse to $surah:$endVerse (${repeatCount}x)');
+
+      final List<String> urls = [];
+      final List<MediaItem> rangeMediaItems = [];
+
+      for (int verse = startVerse; verse <= endVerse; verse++) {
+        final url = getAudioURLByVerse(surah, verse, Storage.reciterId);
+        urls.add(url);
+
+        final mediaItem = MediaItem(
+          id: url,
+          album: 'قران كريم',
+          title:
+              'سُّورَةُ ${getSurahNameArabicFull(surah)} الآية ${verse.toArabicNumbers}',
+          artist: Storage.reciterName,
+          duration: Duration.zero,
+          extras: {
+            'surah': surah,
+            'verse': verse,
+            'url': url,
+            'isRange': true,
+            'startVerse': startVerse,
+            'endVerse': endVerse,
+          },
+        );
+        rangeMediaItems.add(mediaItem);
+      }
+
+      final List<AudioSource> audioSources = [];
+
+      for (int i = 0; i < urls.length; i++) {
+        final url = urls[i];
+        final fileName = url.split('/').last;
+
+        String? localPath;
+        if (Storage.isAutoDownload) {
+          localPath =
+              await AudioDownloader.getLocalPath(fileName, Storage.reciterId);
+          if (localPath != null) {
+            final file = File(localPath);
+            if (!await file.exists()) {
+              localPath = null;
+            }
+          }
+        }
+
+        final source = localPath != null
+            ? AudioSource.uri(Uri.file(localPath))
+            : AudioSource.uri(Uri.parse(url));
+
+        audioSources.add(source);
+      }
+
+      for (int repeatIndex = 0; repeatIndex < repeatCount; repeatIndex++) {
+        print('Repeat ${repeatIndex + 1} of $repeatCount');
+
+        final playlist = ConcatenatingAudioSource(children: audioSources);
+
+        _mediaItems.clear();
+        _mediaItems.addAll(rangeMediaItems);
+
+        await _audioPlayer.setAudioSource(playlist);
+
+        StreamSubscription<int?>? indexSubscription;
+        indexSubscription = _audioPlayer.currentIndexStream.listen((index) {
+          if (index != null && index < rangeMediaItems.length) {
+            final currentVerse = startVerse + index;
+            _updateVerseHighlight(surah, currentVerse);
+
+            if (Storage.isAutoDownload) {
+              _downloadVerseIfNeeded(urls[index], Storage.reciterId);
+            }
+          }
+        });
+
+        await _audioPlayer.play();
+
+        await _audioPlayer.playbackEventStream.firstWhere(
+          (event) => event.processingState == ProcessingState.completed,
+        );
+
+        await indexSubscription.cancel();
+        await _audioPlayer.stop();
+
+        if (repeatIndex < repeatCount - 1) {
+          _resetVerseHighlight();
+          await Future.delayed(const Duration(milliseconds: 500));
+          _updateVerseHighlight(surah, startVerse);
+        }
+      }
+
+      _currentIndexSubscription?.cancel();
+      _resetVerseHighlight();
+
+      print('Verse range playback completed');
+    } catch (e) {
+      print('Failed to play verse range $surah:$startVerse-$endVerse - $e');
+      _resetVerseHighlight();
       rethrow;
     }
   }
@@ -533,10 +664,34 @@ class AudioPlayerHandler extends BaseAudioHandler
   }
 }
 
+Future<void> _downloadVerseIfNeeded(String url, String reciterId) async {
+  try {
+    final fileName = url.split('/').last;
+    final localPath = await AudioDownloader.getLocalPath(fileName, reciterId);
+
+    if (localPath == null || !await File(localPath).exists()) {
+      print("Auto-downloading: $fileName");
+      final downloadedPath = await AudioDownloader.downloadAudio(
+        url,
+        fileName,
+        reciterId,
+      );
+      if (downloadedPath != null) {
+        print("Downloaded: $downloadedPath");
+      } else {
+        print("Download failed: $fileName");
+      }
+    }
+  } catch (e) {
+    print("Download error: $e");
+  }
+}
+
 enum PlaybackMode {
   none,
   singleVerse,
   playlist,
   radio,
   file,
+  verseRange,
 }

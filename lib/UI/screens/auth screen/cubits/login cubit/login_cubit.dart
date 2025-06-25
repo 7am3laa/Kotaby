@@ -87,6 +87,8 @@ class LoginCubit extends Cubit<LoginState> {
         await Storage.saveCurrentStreak(r.currentStreak);
         await Storage.saveLongestStreak(r.maxStreak);
 
+        final m = await streakService.getUserProgressMemorize();
+        await Storage.saveMemorize(m ?? 0);
         final t = await taskspaln.getTaskSummary();
         if (t.totalTasks != 0) {
           await Storage.saveTaskPlanState(1);
@@ -209,7 +211,7 @@ class LoginCubit extends Cubit<LoginState> {
     isVForget = true;
     emailForgetPassword.clear();
     passworForget.clear();
-    emit(LoginInitial()); 
+    emit(LoginInitial());
   }
 
   Future<void> logout(BuildContext context) async {

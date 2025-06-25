@@ -106,10 +106,16 @@ class SurahPageCubit extends Cubit<SurahPageState> {
       int surah, int verse, BuildContext context, int repeatCount) async {
     _safeNavigatorPop(context);
     try {
-      if (!await _checkConnectivity()) {
-        _showNoConnectionSnackBar(context);
-        return;
-      }
+      // if (!await _checkConnectivity()) {
+      //   _showNoConnectionSnackBar(context);
+      //   return;
+      // }
+
+      await _playbackSubscription?.cancel();
+
+      resetVerseHighlight();
+
+      await Future.delayed(const Duration(milliseconds: 50));
 
       _updateVerseState(surah, verse);
 
@@ -120,15 +126,10 @@ class SurahPageCubit extends Cubit<SurahPageState> {
         repeatCount: repeatCount,
       );
 
-      await _playbackSubscription?.cancel();
-
       _playbackSubscription = audioHandler.playbackState.listen(
         (playbackState) {
           if (playbackState.processingState == AudioProcessingState.completed) {
             resetVerseHighlight();
-          }
-          if (playbackState.processingState == AudioProcessingState.ready) {
-            _updateVerseState(surah, verse);
           }
         },
         onError: (error) {
@@ -154,6 +155,139 @@ class SurahPageCubit extends Cubit<SurahPageState> {
         );
       }
       _safeNavigatorPop(context);
+    }
+  }
+
+  Future<void> playVerseRangeFromControllers({
+    required int surah,
+    required TextEditingController fromController,
+    required TextEditingController toController,
+    required TextEditingController repeatController,
+    required BuildContext context,
+  }) async {
+    _safeNavigatorPop(context);
+
+    try {
+      final String fromText = fromController.text.trim();
+      final String toText = toController.text.trim();
+      final String repeatText = repeatController.text.trim();
+
+      if (fromText.isEmpty || toText.isEmpty) {
+        if (context.mounted) {
+          customSnakeBar(
+            context: context,
+            tilte: "يرجى إدخال أرقام الآيات",
+            isSuccess: false,
+          );
+        }
+        return;
+      }
+
+      int? startVerse = int.tryParse(fromText);
+      int? endVerse = int.tryParse(toText);
+      int repeatCount = int.tryParse(repeatText) ?? 1;
+
+      if (startVerse == null || endVerse == null) {
+        if (context.mounted) {
+          customSnakeBar(
+            context: context,
+            tilte: "يرجى إدخال أرقام صحيحة",
+            isSuccess: false,
+          );
+        }
+        return;
+      }
+
+      if (repeatCount < 1) {
+        repeatCount = 1;
+      }
+
+      // if (!await _checkConnectivity()) {
+      //   _showNoConnectionSnackBar(context);
+      //   return;
+      // }
+
+      if (startVerse > endVerse) {
+        if (context.mounted) {
+          customSnakeBar(
+            context: context,
+            tilte: "رقم الآية الأولى يجب أن يكون أصغر من رقم الآية الأخيرة",
+            isSuccess: false,
+          );
+        }
+        return;
+      }
+
+      if (startVerse < 1 || endVerse > getVerseCount(surah)) {
+        if (context.mounted) {
+          customSnakeBar(
+            context: context,
+            tilte: "أرقام الآيات غير صحيحة",
+            isSuccess: false,
+          );
+        }
+        return;
+      }
+
+      await _playbackSubscription?.cancel();
+      await _verseSubscription?.cancel();
+
+      resetVerseHighlight();
+
+      final startPage = getPageNumber(surah, startVerse);
+      if (startPage != state.currentPage) {
+        if (state.pageController.hasClients) {
+          state.pageController.jumpToPage(startPage);
+        }
+        emit(state.copyWith(currentPage: startPage));
+      }
+
+      _updateVerseState(surah, startVerse);
+
+      await audioHandler.playVerseRange(
+        surah: surah,
+        startVerse: startVerse,
+        endVerse: endVerse,
+        repeatCount: repeatCount,
+      );
+
+      _playbackSubscription = audioHandler.playbackState.listen(
+        (playbackState) {
+          if (playbackState.processingState == AudioProcessingState.completed) {
+            resetVerseHighlight();
+          }
+        },
+        onError: (error) {
+          print('Error in verse range playback state stream: $error');
+          resetVerseHighlight();
+          if (context.mounted) {
+            customSnakeBar(
+              context: context,
+              tilte: "حدث خطأ في تشغيل الآيات",
+              isSuccess: false,
+            );
+          }
+        },
+      );
+
+      if (context.mounted) {
+        // customSnakeBar(
+        //   context: context,
+        //   tilte:
+        //       "بدء تشغيل الآيات من ${startVerse.toArabicNumbers} إلى ${endVerse.toArabicNumbers} (${repeatCount.toArabicNumbers} مرات)",
+        //   isSuccess: true,
+        // );
+      }
+    } catch (e) {
+      print('Error in playVerseRangeFromControllers: $e');
+      resetVerseHighlight();
+      if (context.mounted) {
+        customSnakeBar(
+          context: context,
+          tilte: "حدث خطأ في تشغيل الآيات",
+          isSuccess: false,
+        );
+      }
     }
   }
 

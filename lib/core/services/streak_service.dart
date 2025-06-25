@@ -47,4 +47,22 @@ class StreakService {
       rethrow;
     }
   }
+
+  Future<int?> getUserProgressMemorize() async {
+    try {
+      final response = await dio.get(
+        'https://kotaby.duckdns.org/quran/progress/${Storage.useridCached}',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      int progress = int.tryParse(response.data.toString()) ?? 0;
+      return progress;
+    } catch (e) {
+      print('Error fetching user progress: $e');
+      return null;
+    }
+  }
 }

@@ -47,6 +47,8 @@ class Storage {
   static int currentStreak = 1;
   static int longestStreak = 1;
 
+  static int memorizePer = 0;
+
   static Future<void> init() async {
     await getLoginState();
     await loadReciterInfo();
@@ -74,6 +76,18 @@ class Storage {
     await getReadPages();
     await getCurrentStreak();
     await getLongestStreak();
+    await getMemorize();
+  }
+
+  static Future<void> saveMemorize(int memorize) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('saveMemorize', memorize);
+    memorizePer = memorize;
+  }
+
+  static Future<void> getMemorize() async {
+    final prefs = await SharedPreferences.getInstance();
+    memorizePer = prefs.getInt('saveMemorize') ?? 1;
   }
 
   static Future<void> saveLongestStreak(int longestS) async {
@@ -511,12 +525,14 @@ class Storage {
     await prefs.remove("longestStreak");
     await prefs.remove("surah");
     await prefs.remove("verse");
+    await prefs.remove("saveMemorize");
     await clearAllCompletion();
     await clearUserImage();
     usernameCached = '';
     useridCached = 0;
     currentStreak = 1;
     longestStreak = 1;
+    memorizePer = 0;
     surahNumber = 1;
     verseNumber = 1;
     userEmailCached = '';

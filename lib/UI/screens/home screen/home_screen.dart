@@ -21,6 +21,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final streakService = StreakService();
+  Future<void> _handleRefresh() async {
+    await Storage.getMemorize();
+    await Storage.getCurrentStreak();
+    await Storage.getLongestStreak();
+    await Storage.getCompletionPercentage();
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,31 +44,36 @@ class _HomeScreenState extends State<HomeScreen> {
         isDrawer: true,
       ),
       drawer: const HomeDrawer(),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildWelcomeSection(width),
-          const SizedBox(height: 20),
-          BookmarkContainer(width: width, height: height),
-          const SizedBox(height: 20),
-          Row(
-            spacing: 10,
-            children: [
-              StreakContainer(
-                title: "Current Streak",
-                numOfDays: Storage.currentStreak,
-                width: width,
-              ),
-              StreakContainer(
-                title: "Longest Streak",
-                numOfDays: Storage.longestStreak,
-                width: width,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildProgressSection(width, height),
-        ],
+
+      // استخدم RefreshIndicator هنا
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            _buildWelcomeSection(width),
+            const SizedBox(height: 20),
+            BookmarkContainer(width: width, height: height),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                StreakContainer(
+                  title: "Current Streak",
+                  numOfDays: Storage.currentStreak,
+                  width: width,
+                ),
+                const SizedBox(width: 10),
+                StreakContainer(
+                  title: "Longest Streak",
+                  numOfDays: Storage.longestStreak,
+                  width: width,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildProgressSection(width, height),
+          ],
+        ),
       ),
     );
   }
@@ -125,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ProgressContainer(
           icon: "assets/images/icons/icon2.png",
           title: "Memorization",
-          percentage: "40%",
+          percentage: "${Storage.memorizePer}%",
           width: width,
           height: height,
           onTap: () {},

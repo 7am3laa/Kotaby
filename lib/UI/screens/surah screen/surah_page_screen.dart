@@ -72,6 +72,8 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   String se = "";
   Timer? highlightTimer;
   final TextEditingController repeatController = TextEditingController();
+  TextEditingController fromController = TextEditingController();
+  TextEditingController toController = TextEditingController();
 
   void updateStreak() async {
     final streakService = StreakService();
@@ -96,6 +98,8 @@ class _SurahPageContentState extends State<_SurahPageContent> {
     final r = await streakService.getStreak();
     await Storage.saveCurrentStreak(r.currentStreak);
     await Storage.saveLongestStreak(r.maxStreak);
+    final m = await streakService.getUserProgressMemorize();
+    await Storage.saveMemorize(m ?? 0);
   }
 
   void changColor() {
@@ -149,6 +153,8 @@ class _SurahPageContentState extends State<_SurahPageContent> {
   void dispose() {
     highlightTimer?.cancel();
     repeatController.dispose();
+    fromController.dispose();
+    toController.dispose();
     super.dispose();
   }
 
@@ -531,6 +537,125 @@ class _SurahPageContentState extends State<_SurahPageContent> {
               ),
               SizedBox(height: 10.h),
               Padding(
+                padding:
+                    EdgeInsets.symmetric(vertical: 5.h, horizontal: 20.0.w),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 60.w,
+                      child: TextField(
+                        controller: toController,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "إلى",
+                          hintStyle:
+                              TextStyle(color: Colors.grey[600], fontSize: 15),
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 5),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: textColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: textColor,
+                              width: 2,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: textColor,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    CustomText(
+                      text: "إلى",
+                      color: textColor,
+                    ),
+                    SizedBox(width: 12.w),
+                    SizedBox(
+                      width: 60.w,
+                      child: TextField(
+                        controller: fromController,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "من",
+                          hintStyle:
+                              TextStyle(color: Colors.grey[600], fontSize: 15),
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 5),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: textColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: textColor,
+                              width: 2,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: textColor,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    CustomText(
+                      text: "من",
+                      color: textColor,
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: _buildActionButton(
+                        icon: Icons.play_arrow,
+                        label: "تشغيل",
+                        onTap: () {
+                          cubit.playVerseRangeFromControllers(
+                            surah: surah,
+                            fromController: fromController,
+                            toController: toController,
+                            repeatController: repeatController,
+                            context: context,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0.w),
                 child: TextField(
                   controller: repeatController,
@@ -648,6 +773,7 @@ class _SurahPageContentState extends State<_SurahPageContent> {
         children: [
           Card(
             color: const Color.fromARGB(255, 91, 62, 29),
+            shape: StadiumBorder(),
             child: IconButton(
               onPressed: onTap,
               icon: Icon(icon),
