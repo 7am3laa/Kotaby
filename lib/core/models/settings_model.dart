@@ -31,6 +31,11 @@ List<SettingsModel> settings = [
     icon: Icons.sd_storage_outlined,
   ),
   SettingsModel(
+    title: "Theme and Color",
+    subtitle: "change theme color",
+    icon: Icons.color_lens_rounded,
+  ),
+  SettingsModel(
     title: "Help",
     subtitle: "Help center, contact us",
     icon: Icons.headset_mic_outlined,

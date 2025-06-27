@@ -37,15 +37,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final height = size.height;
 
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : darklighMode,
       appBar: const CustomAppBar(
         title: "Kotaby - كُتّابي",
         islead: false,
         isDrawer: true,
       ),
       drawer: const HomeDrawer(),
-
-      // استخدم RefreshIndicator هنا
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
         child: ListView(
@@ -92,7 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         CustomText(
           text: Storage.usernameCached.toString(),
-          color: Colors.white.withOpacity(.8),
+          color:
+              Storage.themeState == 1 ? Colors.white.withOpacity(.8) : bColor,
           fontSize: (width > 500 && width < 750)
               ? 13
               : width >= 750
@@ -109,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         CustomText(
           text: "Progress",
-          color: Colors.white,
+          color: Storage.themeState == 1 ? Colors.white : Colors.black,
           fontSize: (width > 500 && width < 750)
               ? 14
               : width >= 750

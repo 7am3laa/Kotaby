@@ -3,6 +3,7 @@ import 'package:kotaby/UI/screens/main%20screen/main_screen.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class AzkarScreen extends StatefulWidget {
   final String title;
@@ -80,10 +81,10 @@ class _AzkarScreenState extends State<AzkarScreen> {
           MaterialPageRoute(builder: (_) => MainScreen()),
           (route) => false,
         );
-        return false; // معناها احنا اتحكمنا في الرجوع
+        return false;
       },
       child: Scaffold(
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         appBar: CustomAppBar(title: widget.title),
         body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -112,7 +113,9 @@ class _AzkarScreenState extends State<AzkarScreen> {
                           child: CustomText(
                             text: '${index + 1} / ${widget.azkarList.length}',
                             fontSize: 18,
-                            color: Colors.white70,
+                            color: Storage.themeState == 1
+                                ? Colors.white70
+                                : bColor,
                           ),
                         ),
                       ),
@@ -123,7 +126,9 @@ class _AzkarScreenState extends State<AzkarScreen> {
                             CustomText(
                               text: "${zekr['zekr'].replaceAll('.', '')}",
                               textAlign: TextAlign.center,
-                              color: Colors.white,
+                              color: Storage.themeState == 1
+                                  ? Colors.white
+                                  : bColor,
                               fontWeight: FontWeight.w800,
                               textDirection: TextDirection.rtl,
                             ),
@@ -158,7 +163,8 @@ class _AzkarScreenState extends State<AzkarScreen> {
                 height: 100,
                 child: CircularProgressIndicator(
                   value: progress,
-                  backgroundColor: Colors.white24,
+                  backgroundColor:
+                      Storage.themeState == 1 ? Colors.white24 : Colors.grey,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   strokeWidth: 6,
                 ),

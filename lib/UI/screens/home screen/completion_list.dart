@@ -48,24 +48,24 @@ class _CompletionListState extends State<CompletionList> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: primaryColor,
-        title: const CustomText(
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
+        title: CustomText(
           text: 'Delete Completion List',
-          color: Colors.white,
+          color: Storage.themeState == 1 ? Colors.white : bColor,
           fontSize: 20,
         ),
-        content: const CustomText(
+        content: CustomText(
           text:
               'Are you sure you want to delete your completion list? This action cannot be undone.',
-          color: Colors.white70,
+          color: Storage.themeState == 1 ? Colors.white70 : bColor,
           fontSize: 16,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const CustomText(
+            child: CustomText(
               text: 'Cancel',
-              color: Colors.white70,
+              color: Storage.themeState == 1 ? Colors.white70 : bColor,
               fontSize: 16,
             ),
           ),
@@ -124,7 +124,7 @@ class _CompletionListState extends State<CompletionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: CustomAppBar(
         title: 'Completion List',
         actions: [
@@ -138,7 +138,10 @@ class _CompletionListState extends State<CompletionList> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: bColor,
+            ))
           : Column(
               children: [
                 Expanded(
@@ -184,7 +187,7 @@ class _CompletionItemWidget extends StatelessWidget {
           screen: SurahPageScreen(
             pageNumber: item.startPage,
             shouldHighlightText: true,
-            highlightVerse: "${suarhNumber}:${ayaNumber}",
+            highlightVerse: "$suarhNumber:$ayaNumber",
             lastp: item.endPage + 1,
           ),
         );
@@ -193,8 +196,10 @@ class _CompletionItemWidget extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: item.completed
-              ? Colors.green.withOpacity(0.2)
-              : Colors.white.withOpacity(0.1),
+              ? Colors.green.withOpacity(0.5)
+              : Storage.themeState == 1
+                  ? Colors.white.withOpacity(.2)
+                  : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -209,9 +214,7 @@ class _CompletionItemWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: item.completed
-                    ? Colors.green.withOpacity(0.3)
-                    : bColor.withOpacity(0.2),
+                color: item.completed ? Colors.green.withOpacity(0.3) : bColor,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
                 ),
@@ -236,10 +239,10 @@ class _CompletionItemWidget extends StatelessWidget {
                     icon: Icon(
                       item.completed
                           ? Icons.check_circle
-                          : Icons.check_circle_outline,
+                          : Icons.check_circle_outline_outlined,
                       size: 20,
                     ),
-                    color: item.completed ? Colors.green : Colors.white70,
+                    color: item.completed ? Colors.green : Colors.white,
                   ),
                 ],
               ),
@@ -253,24 +256,24 @@ class _CompletionItemWidget extends StatelessWidget {
                     child: CustomText(
                       text: getSurahNameArabicFull(
                           getPageData(item.startPage)[0]["surah"]),
-                      color: Colors.white,
+                      color: Storage.themeState == 1 ? Colors.white : bColor,
                       fontSize: 18,
-                      fontFamily: "new",
+                      fontFamily: "Hafs",
                       fontWeight: FontWeight.bold,
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward,
-                    color: Colors.white70,
+                    color: Storage.themeState == 1 ? Colors.white70 : bColor,
                     size: 20,
                   ),
                   Expanded(
                     child: CustomText(
                       text: getSurahNameArabicFull(
                           getPageData(item.endPage)[0]["surah"]),
-                      color: Colors.white,
-                      fontFamily: "new",
+                      color: Storage.themeState == 1 ? Colors.white : bColor,
+                      fontFamily: "Hafs",
                       fontSize: 18,
                       textAlign: TextAlign.center,
                     ),

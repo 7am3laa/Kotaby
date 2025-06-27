@@ -7,6 +7,7 @@ import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_state
 import 'package:kotaby/UI/screens/settings%20screen/screens/contact_us_screen.dart';
 import 'package:kotaby/UI/screens/settings%20screen/cubits/update_info_cubit.dart';
 import 'package:kotaby/UI/screens/settings%20screen/screens/storage_screen.dart';
+import 'package:kotaby/UI/screens/settings%20screen/screens/theme_color_screen.dart';
 import 'package:kotaby/UI/screens/settings%20screen/screens/top_10_screen.dart';
 import 'package:kotaby/UI/screens/settings%20screen/screens/check_password.dart';
 import 'package:kotaby/UI/screens/settings%20screen/screens/notfications_screen.dart';
@@ -17,16 +18,21 @@ import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/storage.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final loginCubit = context.watch<LoginCubit>();
     bool isWideScreen = MediaQuery.of(context).size.width >= 500;
 
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: const CustomAppBar(
         title: "Settings",
         islead: false,
@@ -44,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                   Expanded(
                     child: CustomText(
                       text: Storage.usernameCached,
-                      color: Colors.white,
+                      color: Storage.themeState == 1 ? Colors.white : bColor,
                       fontSize: isWideScreen ? 20 : 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -86,6 +92,13 @@ class SettingsScreen extends StatelessWidget {
             context: context,
             isWideScreen: isWideScreen,
             index: 4,
+            screen: const ThemeColorScreen(),
+          ),
+          SizedBox(height: 10.h),
+          _buildTile(
+            context: context,
+            isWideScreen: isWideScreen,
+            index: 5,
             screen: const ContactUsScreen(),
           ),
           SizedBox(height: 20.h),
@@ -217,37 +230,45 @@ class SettingsScreen extends StatelessWidget {
         size: 30.sp,
       ),
       memCacheHeight: 200,
-      memCacheWidth: 200,
+      memCacheWidth: 150,
       cacheKey: imageUrl.split('?').first,
     );
   }
-}
 
-Widget _buildTile({
-  required BuildContext context,
-  required bool isWideScreen,
-  required int index,
-  required Widget screen,
-}) {
-  return ListTile(
-    leading: Icon(
-      settings[index].icon,
-      size: isWideScreen ? 25.w : 30.w,
-      color: Colors.white,
-    ),
-    title: CustomText(
-      text: settings[index].title,
-      color: Colors.white,
-      fontSize: isWideScreen ? 14 : 22,
-      fontWeight: FontWeight.w600,
-    ),
-    subtitle: CustomText(
-      text: settings[index].subtitle,
-      fontSize: isWideScreen ? 10 : 12,
-      color: Colors.white.withOpacity(0.7),
-    ),
-    onTap: () {
-      N.pushto(context: context, screen: screen);
-    },
-  );
+  Widget _buildTile({
+    required BuildContext context,
+    required bool isWideScreen,
+    required int index,
+    required Widget screen,
+  }) {
+    return ListTile(
+      leading: Icon(
+        settings[index].icon,
+        size: isWideScreen ? 25.w : 30.w,
+        color: Storage.themeState == 1 ? Colors.white : bColor,
+      ),
+      title: CustomText(
+        text: settings[index].title,
+        color: Storage.themeState == 1 ? Colors.white : bColor,
+        fontSize: isWideScreen ? 14 : 22,
+        fontWeight: FontWeight.w600,
+      ),
+      subtitle: CustomText(
+        text: settings[index].subtitle,
+        fontSize: isWideScreen ? 10 : 12,
+        color: Storage.themeState == 1 ? Colors.white.withOpacity(0.7) : bColor,
+      ),
+      onTap: index != 4
+          ? () => N.pushto(context: context, screen: screen)
+          : () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ThemeColorScreen()),
+              );
+              if (result == true) {
+                setState(() {});
+              }
+            },
+    );
+  }
 }

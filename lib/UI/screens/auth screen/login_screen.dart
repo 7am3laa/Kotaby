@@ -4,12 +4,14 @@ import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_cubit
 import 'package:kotaby/UI/screens/auth%20screen/cubits/login%20cubit/login_state.dart';
 import 'package:kotaby/UI/screens/auth%20screen/forgetpassword_screen.dart';
 import 'package:kotaby/UI/screens/main%20screen/main_screen.dart';
+import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/customs_fields.dart';
 import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/functions/snake_bar.dart';
 import 'package:kotaby/core/functions/validation.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class LoginScreen extends StatelessWidget {
   final VoidCallback toggleScreen;
@@ -58,11 +60,13 @@ class LoginScreen extends StatelessWidget {
                 text: "Welcome Back",
                 fontWeight: FontWeight.bold,
                 fontSize: isWidth ? 15 : 25,
+                color: Storage.themeState == 1 ? sColor : bColor,
               ),
               CustomText(
                 text: "Login to continue",
                 fontWeight: FontWeight.bold,
                 fontSize: isWidth ? 13 : 21,
+                color: Storage.themeState == 1 ? sColor : bColor,
               ),
               const SizedBox(height: 30),
               customField(
@@ -102,12 +106,14 @@ class LoginScreen extends StatelessWidget {
                   CustomText(
                     text: "Don't have an account? ",
                     fontSize: isWidth ? 10 : 15,
+                    color: Storage.themeState == 1 ? sColor : bColor,
                   ),
                   InkWell(
                     onTap: toggleScreen,
                     child: CustomText(
                       text: "Sign Up",
-                      color: Colors.white,
+                      color:
+                          Storage.themeState == 1 ? Colors.white : Colors.blue,
                       fontSize: isWidth ? 10 : 15,
                     ),
                   ),

@@ -4,6 +4,7 @@ import 'package:kotaby/UI/screens/settings%20screen/cubits/storage_cubit.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class StorageScreen extends StatelessWidget {
   const StorageScreen({super.key});
@@ -24,7 +25,7 @@ class StorageScreen extends StatelessWidget {
       create: (_) => StorageCubit(),
       child: Scaffold(
         appBar: const CustomAppBar(title: "Storage and Data"),
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         body: BlocBuilder<StorageCubit, StorageState>(
           builder: (context, state) {
             final cubit = context.read<StorageCubit>();
@@ -63,7 +64,9 @@ class StorageScreen extends StatelessWidget {
                       text: (state.totalDiskSpace > 0)
                           ? "${((totalUsed / state.totalDiskSpace) * 100).toStringAsFixed(1)}% used"
                           : "Storage info unavailable",
-                      color: Colors.white70,
+                      color: Storage.themeState == 1
+                          ? Colors.white70
+                          : Colors.black,
                       fontSize: 12,
                     ),
                   ),
@@ -99,13 +102,17 @@ class StorageScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Storage.themeState == 1
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.black.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: CustomText(
                           text:
                               'Used in Kotaby ${dir.path.split("/files/").last}: ${formatSize(size)}',
-                          color: Colors.white70,
+                          color: Storage.themeState == 1
+                              ? Colors.white70
+                              : Colors.black,
                           fontSize: 14,
                         ),
                       ),
@@ -123,7 +130,7 @@ class StorageScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title, bool isWideScreen) {
     return CustomText(
       text: title,
-      color: Colors.white,
+      color: Storage.themeState == 1 ? Colors.white : bColor,
       fontSize: isWideScreen ? 18 : 24,
       fontWeight: FontWeight.bold,
     );
@@ -133,7 +140,9 @@ class StorageScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Storage.themeState == 1
+            ? Colors.white.withOpacity(0.1)
+            : Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(children: children),
@@ -147,13 +156,13 @@ class StorageScreen extends StatelessWidget {
         Flexible(
           child: CustomText(
             text: title,
-            color: Colors.white,
+            color: Storage.themeState == 1 ? Colors.white : Colors.black,
             fontSize: 16,
           ),
         ),
         CustomText(
           text: value,
-          color: Colors.white70,
+          color: Storage.themeState == 1 ? Colors.white70 : Colors.black,
           fontSize: 14,
         ),
       ],
@@ -171,7 +180,7 @@ class StorageScreen extends StatelessWidget {
         Flexible(
           child: CustomText(
             text: title,
-            color: Colors.white,
+            color: Storage.themeState == 1 ? Colors.white : Colors.black,
             fontSize: 16,
           ),
         ),

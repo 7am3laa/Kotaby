@@ -6,6 +6,7 @@ import 'package:kotaby/UI/screens/surah%20screen/all_surah_quran_screen.dart';
 import 'package:kotaby/UI/screens/tafsir%20screen/all_surah_tafsir.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/services/tafseer_api.dart';
+import 'package:kotaby/storage.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -37,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         currentIndex: _currentIndex,
         useLegacyColorScheme: false,
         onTap: _updateIndex,

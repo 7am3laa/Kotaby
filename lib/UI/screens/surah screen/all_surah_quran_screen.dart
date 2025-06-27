@@ -4,6 +4,7 @@ import 'package:kotaby/UI/screens/surah%20screen/surah_screen.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
 import 'package:quran/surah_data.dart';
 import 'package:string_validator/string_validator.dart';
@@ -107,7 +108,7 @@ class _AllSurahQuranScreenState extends State<AllSurahQuranScreen>
   Widget build(BuildContext context) {
     bool isWidth = MediaQuery.of(context).size.width > 500;
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: CustomAppBar(
         title: "القرآن الكريم",
         islead: false,
@@ -120,7 +121,7 @@ class _AllSurahQuranScreenState extends State<AllSurahQuranScreen>
                 child: CustomText(
                   text: "السور",
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: Storage.themeState == 1 ? Colors.white : bColor,
                   fontSize: isWidth ? 10 : 25,
                 ),
               ),
@@ -128,9 +129,9 @@ class _AllSurahQuranScreenState extends State<AllSurahQuranScreen>
             Tab(
               child: Center(
                 child: CustomText(
-                  text: "الاجزء",
+                  text: "الأجزاء",
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: Storage.themeState == 1 ? Colors.white : bColor,
                   fontSize: isWidth ? 10 : 25,
                 ),
               ),

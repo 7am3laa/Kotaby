@@ -7,6 +7,7 @@ import 'package:kotaby/core/functions/to_arabic_number.dart';
 import 'package:kotaby/core/models/tafseer_author.dart';
 import 'package:kotaby/core/services/tafseer_api.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
 
 class TafsirScreen extends StatefulWidget {
@@ -106,7 +107,7 @@ class _TafsirScreenState extends State<TafsirScreen> {
 
     if (isLoading) {
       return Scaffold(
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         body: const Center(
           child: CircularProgressIndicator(color: bColor),
         ),
@@ -115,19 +116,20 @@ class _TafsirScreenState extends State<TafsirScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         elevation: 9,
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
             N.pop(context: context);
           },
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios,
+              color: Storage.themeState == 1 ? Colors.white : Colors.black),
         ),
         title: Text(
           "000 ${widget.suranumber <= 9 ? "00${widget.suranumber}" : widget.suranumber <= 99 ? "0${widget.suranumber}" : widget.suranumber}",
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Storage.themeState == 1 ? Colors.white : bColor,
             fontFamily: "SurahName",
             fontSize: 45,
             fontWeight: FontWeight.w500,
@@ -137,7 +139,7 @@ class _TafsirScreenState extends State<TafsirScreen> {
         ),
         centerTitle: true,
       ),
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: ayat.length,
@@ -151,7 +153,7 @@ class _TafsirScreenState extends State<TafsirScreen> {
             ),
             elevation: 4,
             shadowColor: Colors.black54,
-            color: Colors.white30,
+            color: Storage.themeState == 1 ? Colors.white30 : Colors.white,
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -161,7 +163,7 @@ class _TafsirScreenState extends State<TafsirScreen> {
                   Text(
                     aya,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Storage.themeState == 1 ? Colors.white : bColor,
                       fontWeight: FontWeight.w500,
                       fontFamily: "Hafs",
                       fontSize: isWidth ? 20 : 30,
@@ -189,13 +191,17 @@ class _TafsirScreenState extends State<TafsirScreen> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 12),
                                 decoration: BoxDecoration(
-                                  color: primaryColor,
+                                  color: Storage.themeState == 1
+                                      ? primaryColor
+                                      : bColor,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: DropdownButton<int>(
                                   value: selectedIndex,
                                   isExpanded: true,
-                                  dropdownColor: Colors.black87,
+                                  dropdownColor: Storage.themeState == 1
+                                      ? Colors.black87
+                                      : bColor,
                                   iconEnabledColor: Colors.white,
                                   underline: const SizedBox(),
                                   items: List.generate(tafseerList.length, (i) {
@@ -267,8 +273,12 @@ class _TafsirScreenState extends State<TafsirScreen> {
                                         }
                                       }
                                     },
-                                    icon: const Icon(Icons.menu_book,
-                                        color: Colors.white),
+                                    icon: Icon(
+                                      Icons.menu_book,
+                                      color: Storage.themeState == 1
+                                          ? Colors.white
+                                          : bColor,
+                                    ),
                                   ),
                           ],
                         )
@@ -285,7 +295,8 @@ class _TafsirScreenState extends State<TafsirScreen> {
                           ),
                           title: CustomText(
                             text: "للتفسير اتصل بالانترنت",
-                            color: primaryColor,
+                            color:
+                                Storage.themeState == 1 ? primaryColor : bColor,
                             textAlign: TextAlign.right,
                           ),
                         ),
@@ -294,7 +305,7 @@ class _TafsirScreenState extends State<TafsirScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    color: primaryColor,
+                    color: Storage.themeState == 1 ? primaryColor : bColor,
                     child: ListTile(
                       title: Center(
                         child: Text(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/core/ui_components/custom_text_field.dart';
+import 'package:kotaby/storage.dart';
 
 Widget customPassword({
   required String label,
@@ -18,6 +20,7 @@ Widget customPassword({
       children: [
         CustomText(
           text: label,
+          color: Storage.themeState == 1 ? sColor : bColor,
           fontSize: isWidth ? 12 : 20,
         ),
         CustomTextField(
@@ -45,6 +48,7 @@ Widget customPassword({
                   child: CustomText(
                     text: "Forgot Password?",
                     fontSize: isWidth ? 10 : 15,
+                    color: Storage.themeState == 1 ? sColor : bColor,
                   ),
                 )
               : null,
@@ -68,6 +72,7 @@ Widget customField({
       CustomText(
         text: label,
         fontSize: isWidth ? 12 : 20,
+        color: Storage.themeState == 1 ? sColor : bColor,
       ),
       CustomTextField(
         controller: controller,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kotaby/core/models/users_model.dart';
 import 'package:kotaby/core/services/user_auth_services.dart';
+import 'package:kotaby/storage.dart';
 
 class Top10Cubit extends Cubit<Top10State> {
   final UserAuthServices _authServices = UserAuthServices();
@@ -28,13 +29,15 @@ class Top10Cubit extends Cubit<Top10State> {
   Color getTextColor(int index) {
     if (index == 0 || index == 1) return Colors.black;
     if (index == 2) return Colors.white;
-    return Colors.white;
+    return Storage.themeState == 1 ? Colors.white : Colors.black;
   }
 
   Color getSubTextColor(int index) {
     if (index == 0 || index == 1) return Colors.black.withOpacity(0.5);
     if (index == 2) return Colors.white.withOpacity(0.5);
-    return Colors.white.withOpacity(0.5);
+    return Storage.themeState == 1
+        ? Colors.white.withOpacity(0.5)
+        : Colors.black.withOpacity(0.5);
   }
 }
 

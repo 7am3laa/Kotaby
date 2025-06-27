@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class TafsirTextScreen extends StatelessWidget {
   final int ayaNumber;
@@ -18,7 +19,7 @@ class TafsirTextScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: CustomAppBar(
         title: !isE3rab
             ? "تفسير الآية $ayaNumber - $surahName"
@@ -42,7 +43,7 @@ class TafsirTextScreen extends StatelessWidget {
                     .replaceAll("  ", " ")
                     .replaceAll("/", "\n\n"),
                 fontSize: 22,
-                color: Colors.white,
+                color: Storage.themeState == 1 ? Colors.white : bColor,
                 textAlign: TextAlign.right,
                 textDirection: TextDirection.rtl,
                 // fontFamily: "new",

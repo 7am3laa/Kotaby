@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kotaby/UI/screens/surah%20screen/surah_page_screen.dart';
+import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 import 'package:quran/juz_data.dart';
 import 'package:quran/quran.dart';
 
@@ -33,14 +35,15 @@ class JuzScreen extends StatelessWidget {
         int endlVerse = verses.entries.last.value.last;
 
         return Card(
-          color: const Color(0xff121931),
+          color:
+              Storage.themeState == 1 ? const Color(0xff121931) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
           child: ListTile(
             trailing: CustomText(
               text: "الجزء ${currentJuz['id']}",
-              color: Colors.white,
+              color: Storage.themeState == 1 ? Colors.white : bColor,
               fontFamily: "Hafs",
               fontSize: isWidth ? 15 : 20,
             ),
@@ -53,14 +56,14 @@ class JuzScreen extends StatelessWidget {
                 children: [
                   CustomText(
                     text: "$sf الي $sl",
-                    color: Colors.white,
+                    color: Storage.themeState == 1 ? Colors.white : bColor,
                     fontFamily: "Hafs",
                     fontSize: isWidth ? 12 : 18,
                   ),
                   CustomText(
                     text:
                         "عدد الصفحات : ${getPageNumber(surahNumbers.last, endlVerse) - getPageNumber(surahNumbers.first, startfVerse)}",
-                    color: Colors.white,
+                    color: Storage.themeState == 1 ? Colors.white : bColor,
                     fontFamily: "Hafs",
                     fontSize: isWidth ? 10 : 18,
                   ),

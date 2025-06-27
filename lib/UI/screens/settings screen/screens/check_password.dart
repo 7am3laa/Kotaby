@@ -8,6 +8,7 @@ import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/functions/snake_bar.dart';
 import 'package:kotaby/core/functions/validation.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
+import 'package:kotaby/storage.dart';
 import '../cubits/check_password_cubit.dart'; // Adjust path as necessary
 
 class CheckPassword extends StatelessWidget {
@@ -51,7 +52,8 @@ class CheckPassword extends StatelessWidget {
 
           return Scaffold(
             appBar: const CustomAppBar(title: "Check Password"),
-            backgroundColor: primaryColor,
+            backgroundColor:
+                Storage.themeState == 1 ? primaryColor : Colors.white,
             body: Center(
               child: CustomAnimation(
                 child: Padding(

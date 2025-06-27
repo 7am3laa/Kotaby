@@ -9,6 +9,7 @@ import 'package:kotaby/constants/azkar_elsabah.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({super.key});
@@ -18,13 +19,14 @@ class HomeDrawer extends StatelessWidget {
     return SizedBox(
       width: MediaQuery.of(context).size.width / 1.5,
       child: Drawer(
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         child: ListView(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: DrawerHeader(
-                  child: Image.asset("assets/images/ic_launcher.png")),
+                child: Image.asset("assets/images/ic_launcher.png"),
+              ),
             ),
             buildDrawerItem(
               context: context,
@@ -81,15 +83,15 @@ Widget buildDrawerItem(
     required IconData icon,
     required Widget screen}) {
   return ListTile(
-    leading: Icon(icon, color: Colors.white),
+    leading: Icon(icon, color: Storage.themeState == 1 ? Colors.white : bColor),
     title: CustomText(
       text: title,
-      color: Colors.white,
+      color: Storage.themeState == 1 ? Colors.white : bColor,
       fontSize: 18,
     ),
     trailing: Icon(
       Icons.arrow_forward_ios,
-      color: Colors.white,
+      color: Storage.themeState == 1 ? Colors.white : bColor,
     ),
     onTap: () => N.pushto(context: context, screen: screen),
   );

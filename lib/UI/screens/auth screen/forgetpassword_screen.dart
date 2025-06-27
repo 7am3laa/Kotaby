@@ -8,6 +8,7 @@ import 'package:kotaby/core/functions/validation.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class ForgetpasswordScreen extends StatelessWidget {
   const ForgetpasswordScreen({super.key});
@@ -21,7 +22,7 @@ class ForgetpasswordScreen extends StatelessWidget {
       key: loginCubit.formForgetKey,
       child: Scaffold(
         appBar: CustomAppBar(title: "Forget Password"),
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         body: Center(
           child: SingleChildScrollView(
             child: SizedBox(
@@ -59,9 +60,9 @@ class ForgetpasswordScreen extends StatelessWidget {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CustomText(
+                      CustomText(
                         text: "Enter your email to reset password",
-                        color: Colors.white,
+                        color: Storage.themeState == 1 ? Colors.white : bColor,
                         fontSize: 18,
                       ),
                       const SizedBox(height: 20),

@@ -20,7 +20,8 @@ class NotificationsScreen extends StatelessWidget {
         builder: (context, state) {
           final notCubit = context.read<NotificationCubit>();
           return Scaffold(
-            backgroundColor: primaryColor,
+            backgroundColor:
+                Storage.themeState == 1 ? primaryColor : Colors.white,
             appBar: CustomAppBar(title: "Notifications", iscenterTitle: true),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -221,15 +222,10 @@ class NotificationsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: Storage.themeState == 1
+              ? Colors.white.withOpacity(0.1)
+              : Colors.black.withOpacity(.5),
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: bColor,
-              offset: const Offset(0, 4),
-              blurRadius: 10,
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,

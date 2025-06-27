@@ -5,6 +5,7 @@ import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
 import 'package:quran/surah_data.dart';
 
@@ -15,7 +16,7 @@ class AllSurahTafsir extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isWidth = MediaQuery.of(context).size.width > 500;
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: CustomAppBar(
         title: "التفسير",
         islead: false,
@@ -34,7 +35,9 @@ class AllSurahTafsir extends StatelessWidget {
               "${surahNumber <= 9 ? "00$surahNumber" : surahNumber <= 99 ? "0$surahNumber" : surahNumber}";
 
           return Card(
-            color: const Color(0xff121931),
+            color: Storage.themeState == 1
+                ? const Color(0xff121931)
+                : Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: ListTile(
@@ -51,12 +54,12 @@ class AllSurahTafsir extends StatelessWidget {
                 children: [
                   CustomText(
                     text: surahName,
-                    color: Colors.white,
+                    color: Storage.themeState == 1 ? Colors.white : bColor,
                     fontSize: isWidth ? 10 : 18,
                   ),
                   CustomText(
                     text: s,
-                    color: Colors.white,
+                    color: Storage.themeState == 1 ? Colors.white : bColor,
                     fontFamily: "SurahName",
                     fontSize: isWidth ? 15 : 30,
                   ),
@@ -64,14 +67,17 @@ class AllSurahTafsir extends StatelessWidget {
               ),
               subtitle: CustomText(
                 text: "عدد آياتها $ayahCount",
-                color: Colors.white.withOpacity(.6),
+                color: Storage.themeState == 1
+                    ? Colors.white.withOpacity(.6)
+                    : Colors.black,
                 fontFamily: "Hafs",
+                fontWeight: FontWeight.w500,
                 textAlign: TextAlign.right,
                 fontSize: isWidth ? 9 : 14,
               ),
               trailing: CustomText(
                 text: "$surahNumber",
-                color: Colors.white,
+                color: Storage.themeState == 1 ? Colors.white : bColor,
                 fontSize: isWidth ? 10 : 20,
               ),
               onTap: () {

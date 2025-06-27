@@ -7,6 +7,7 @@ import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
 import 'package:kotaby/main.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:kotaby/storage.dart';
 
 class RadioScreen extends StatefulWidget {
   const RadioScreen({super.key});
@@ -138,7 +139,12 @@ class _RadioScreenState extends State<RadioScreen> {
                   bColor,
                   bColor.withOpacity(.8),
                 ]
-              : [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.05)],
+              : Storage.themeState == 1
+                  ? [
+                      Colors.white.withOpacity(0.1),
+                      Colors.white.withOpacity(0.05)
+                    ]
+                  : [Colors.white, Colors.white],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -183,7 +189,11 @@ class _RadioScreenState extends State<RadioScreen> {
                 Expanded(
                   child: CustomText(
                     text: radio["name"],
-                    color: Colors.white,
+                    color: isCurrent
+                        ? Colors.white
+                        : Storage.themeState == 1
+                            ? Colors.white
+                            : bColor,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
                     textAlign: TextAlign.right,
@@ -212,7 +222,11 @@ class _RadioScreenState extends State<RadioScreen> {
                         )
                       : Icon(
                           Icons.radio_outlined,
-                          color: isCurrent ? bColor : Colors.white,
+                          color: isCurrent
+                              ? bColor
+                              : Storage.themeState == 1
+                                  ? Colors.white
+                                  : Colors.black,
                           size: 24.w,
                         ),
                 ),
@@ -341,7 +355,7 @@ class _RadioScreenState extends State<RadioScreen> {
         iscenterTitle: true,
         islead: true,
       ),
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       body: Column(
         children: [
           Padding(
@@ -350,36 +364,51 @@ class _RadioScreenState extends State<RadioScreen> {
               height: 50,
               child: Center(
                 child: TextField(
-                  cursorColor: Colors.white,
+                  cursorColor: Storage.themeState == 1 ? Colors.white : bColor,
                   controller: _searchController,
                   onChanged: _filterRadios,
                   textAlign: TextAlign.right,
                   style: TextStyle(
-                    color: Colors.white,
+                    color:
+                        Storage.themeState == 1 ? Colors.white : Colors.black,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     hintText: '... ابحث عن إذاعة',
                     hintStyle: TextStyle(
-                      color: Colors.white54,
+                      color: Storage.themeState == 1
+                          ? Colors.white54
+                          : Colors.black,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w400,
                       fontFamily: "Poppins",
                     ),
-                    suffixIcon:
-                        Icon(Icons.search, color: Colors.white, size: 24.w),
+                    suffixIcon: Icon(Icons.search,
+                        color: Storage.themeState == 1
+                            ? Colors.white
+                            : Colors.black,
+                        size: 24.w),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide.none,
+                      borderSide: BorderSide(
+                        color: Storage.themeState == 1
+                            ? Colors.transparent
+                            : Colors.black,
+                      ),
                     ),
                     contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
                     prefixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: Icon(Icons.clear,
-                                color: Colors.white, size: 24.w),
+                            icon: Icon(
+                              Icons.clear,
+                              color: Storage.themeState == 1
+                                  ? Colors.white
+                                  : Colors.black,
+                              size: 24.w,
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               _filterRadios('');

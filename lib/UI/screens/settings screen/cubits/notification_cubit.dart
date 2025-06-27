@@ -44,8 +44,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       NotificationsService.cancelNotificationById(60);
     }
     emit(NotificationUpdated());
-  } 
-
+  }
 
   Future<void> toggleSurahAlkahf(bool value) async {
     await Storage.saveSurahAlkahf(value);

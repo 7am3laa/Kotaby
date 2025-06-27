@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kotaby/UI/screens/auth%20screen/cubits/signup%20cubit/signup_cubit.dart';
 import 'package:kotaby/UI/screens/auth%20screen/cubits/signup%20cubit/signup_state.dart';
+import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/customs_fields.dart';
 import 'package:kotaby/core/functions/snake_bar.dart';
 import 'package:kotaby/core/functions/validation.dart';
 import 'package:kotaby/core/ui_components/custom_button.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class SignupScreen extends StatelessWidget {
   final VoidCallback toggleScreen;
@@ -44,6 +46,7 @@ class SignupScreen extends StatelessWidget {
               CustomText(
                 text: "Create An Account",
                 fontSize: isWidth ? 20 : 25,
+                color: Storage.themeState == 1 ? sColor : bColor,
               ),
               const SizedBox(height: 30),
               customField(
@@ -97,12 +100,14 @@ class SignupScreen extends StatelessWidget {
                   CustomText(
                     text: "Already have an account? ",
                     fontSize: isWidth ? 10 : 15,
+                    color: Storage.themeState == 1 ? sColor : bColor,
                   ),
                   InkWell(
                     onTap: toggleScreen,
                     child: CustomText(
                       text: "Log In",
-                      color: Colors.white,
+                      color:
+                          Storage.themeState == 1 ? Colors.white : Colors.blue,
                       fontSize: isWidth ? 10 : 15,
                     ),
                   ),

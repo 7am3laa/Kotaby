@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget>? actions;
-  final Color? backgroundColor;
   final Color? textColor;
   final bool islead;
   final bool iscenterTitle;
   final bool issearch;
   final Function? onChanged;
   final VoidCallback? onColse;
-  final bool isBlack;
+  // final bool isBlack;
   final TextEditingController? searchController;
   final PreferredSizeWidget? bottom;
   final bool isDrawer;
@@ -23,14 +23,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.actions,
-    this.backgroundColor = primaryColor,
     this.textColor,
     this.islead = true,
     this.iscenterTitle = true,
     this.issearch = false,
     this.onChanged,
     this.onColse,
-    this.isBlack = false,
+    // this.isBlack = false,
     this.searchController,
     this.bottom,
     this.isDrawer = false,
@@ -42,14 +41,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     double width = MediaQuery.of(context).size.width;
 
     return AppBar(
-      backgroundColor: backgroundColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : darklighMode,
       elevation: 0,
       automaticallyImplyLeading: false,
       centerTitle: iscenterTitle,
       iconTheme: IconThemeData(color: Colors.white),
       title: CustomText(
         text: title,
-        color: Colors.white,
+        color: Storage.themeState == 1 ? Colors.white : bColor,
         fontWeight: FontWeight.w600,
         fontFamily: (title == "Kotaby - كُتّابي") ? "Hafs" : fontFamily,
         fontSize: (width > 500 && width < 750)
@@ -63,13 +62,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.arrow_back_ios_new_outlined,
-                  color: isBlack ? Colors.black : Colors.white),
+              icon: Icon(
+                Icons.arrow_back_ios_new_outlined,
+                color: Storage.themeState == 0 ? Colors.black : Colors.white,
+              ),
             )
           : isDrawer
               ? Builder(
                   builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.white),
+                    icon: Icon(
+                      Icons.menu,
+                      color:
+                          Storage.themeState == 1 ? Colors.white : Colors.black,
+                    ),
                     onPressed: () => Scaffold.of(context).openDrawer(),
                   ),
                 )

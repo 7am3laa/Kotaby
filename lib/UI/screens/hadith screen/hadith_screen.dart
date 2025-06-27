@@ -5,6 +5,7 @@ import 'package:kotaby/core/ui_components/custom_button.dart';
 import 'package:kotaby/UI/screens/hadith screen/models/hadith_model.dart';
 import 'package:kotaby/UI/screens/hadith screen/services/hadith_api_service.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class HadithScreen extends StatefulWidget {
   const HadithScreen({super.key});
@@ -22,7 +23,7 @@ class _HadithScreenState extends State<HadithScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: CustomAppBar(
         title: "الباحث الحديثي",
         islead: false,

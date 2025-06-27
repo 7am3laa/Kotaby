@@ -54,7 +54,7 @@ class _CompletionState extends State<Completion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
       appBar: CustomAppBar(title: "Completion"),
       body: Stack(
         children: [
@@ -66,14 +66,18 @@ class _CompletionState extends State<Completion> {
                 CustomText(
                   text: 'Create Your Quran Reading Plan',
                   fontSize: 22,
-                  color: Colors.white.withOpacity(.8),
+                  color: Storage.themeState == 1
+                      ? Colors.white.withOpacity(.8)
+                      : bColor,
                   fontWeight: FontWeight.bold,
                 ),
                 const SizedBox(height: 20),
                 const Spacer(),
                 Card(
                   elevation: 4,
-                  color: Colors.white.withOpacity(.1),
+                  color: Storage.themeState == 1
+                      ? Colors.white.withOpacity(.1)
+                      : Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -82,18 +86,24 @@ class _CompletionState extends State<Completion> {
                         CustomText(
                           text: 'Your Reading Plan',
                           fontSize: 18,
-                          color: Colors.white.withOpacity(.8),
+                          color: Storage.themeState == 1
+                              ? Colors.white.withOpacity(.8)
+                              : bColor,
                           fontWeight: FontWeight.bold,
                         ),
                         const SizedBox(height: 10),
                         CustomText(
                           text: 'Total pages: $totalQuranPages',
-                          color: Colors.white.withOpacity(.8),
+                          color: Storage.themeState == 1
+                              ? Colors.white.withOpacity(.8)
+                              : bColor,
                           fontSize: 18,
                         ),
                         CustomText(
                           text: 'Total days: $selectedDays',
-                          color: Colors.white.withOpacity(.8),
+                          color: Storage.themeState == 1
+                              ? Colors.white.withOpacity(.8)
+                              : bColor,
                           fontSize: 18,
                         ),
                         // CustomText(
@@ -120,7 +130,9 @@ class _CompletionState extends State<Completion> {
                 CustomText(
                   text: 'Select number of days to complete:',
                   fontSize: 18,
-                  color: Colors.white.withOpacity(.8),
+                  color: Storage.themeState == 1
+                      ? Colors.white.withOpacity(.8)
+                      : bColor,
                   fontWeight: FontWeight.bold,
                 ),
                 Slider(
@@ -145,7 +157,9 @@ class _CompletionState extends State<Completion> {
             Container(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: bColor,
+                ),
               ),
             ),
         ],

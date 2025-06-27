@@ -49,6 +49,8 @@ class Storage {
 
   static int memorizePer = 0;
 
+  static int themeState = 0;
+
   static Future<void> init() async {
     await getLoginState();
     await loadReciterInfo();
@@ -77,6 +79,18 @@ class Storage {
     await getCurrentStreak();
     await getLongestStreak();
     await getMemorize();
+    await getTheme();
+  }
+
+  static Future<void> saveTheme(int theme) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('theme', theme);
+    themeState = theme;
+  }
+
+  static Future<void> getTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    themeState = prefs.getInt('theme') ?? 1;
   }
 
   static Future<void> saveMemorize(int memorize) async {

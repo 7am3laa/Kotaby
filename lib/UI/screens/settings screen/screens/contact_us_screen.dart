@@ -5,6 +5,7 @@ import 'package:kotaby/UI/screens/settings%20screen/cubits/contact_us_cubit.dart
 import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 
 class ContactUsScreen extends StatelessWidget {
   const ContactUsScreen({super.key});
@@ -16,7 +17,7 @@ class ContactUsScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => ContactUsCubit(),
       child: Scaffold(
-        backgroundColor: primaryColor,
+        backgroundColor: Storage.themeState == 1 ? primaryColor : Colors.white,
         appBar: const CustomAppBar(title: "Help"),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -30,7 +31,7 @@ class ContactUsScreen extends StatelessWidget {
                 child: CustomText(
                   text:
                       "We're here to help you! Reach out to us via WhatsApp or email for any queries.",
-                  color: Colors.white,
+                  color: Storage.themeState == 1 ? Colors.white : bColor,
                   fontSize: isWidth ? 16 : 14,
                   textAlign: TextAlign.center,
                 ),
@@ -39,7 +40,9 @@ class ContactUsScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 15),
                   Card(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Storage.themeState == 1
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -59,7 +62,9 @@ class ContactUsScreen extends StatelessWidget {
                     ),
                   ),
                   Card(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Storage.themeState == 1
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

@@ -63,7 +63,8 @@ class UpdateScreen extends StatelessWidget {
         return Form(
           key: updateCubit.formKey,
           child: Scaffold(
-            backgroundColor: primaryColor,
+            backgroundColor:
+                Storage.themeState == 1 ? primaryColor : Colors.white,
             appBar: CustomAppBar(
               title: "Account",
               iscenterTitle: false,
@@ -85,6 +86,8 @@ class UpdateScreen extends StatelessWidget {
                               child: CustomText(
                                 text: "New Name",
                                 fontSize: isWidth ? 12 : 20,
+                                color:
+                                    Storage.themeState == 1 ? sColor : bColor,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -105,6 +108,8 @@ class UpdateScreen extends StatelessWidget {
                               child: CustomText(
                                 text: "Email",
                                 fontSize: isWidth ? 12 : 20,
+                                color:
+                                    Storage.themeState == 1 ? sColor : bColor,
                               ),
                             ),
                             const SizedBox(height: 8),

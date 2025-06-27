@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kotaby/UI/screens/surah%20screen/surah_page_screen.dart';
+import 'package:kotaby/constants/constants.dart';
 import 'package:kotaby/core/functions/navigate.dart';
 import 'package:kotaby/core/ui_components/custom_text.dart';
+import 'package:kotaby/storage.dart';
 import 'package:quran/quran.dart';
 
 class SurahScreen extends StatelessWidget {
@@ -40,27 +42,36 @@ class SurahScreen extends StatelessWidget {
               child: TextField(
                 controller: searchController,
                 onChanged: (value) => searchLogic(value),
-                cursorColor: Colors.white,
+                cursorColor:
+                    Storage.themeState == 1 ? Colors.white : Colors.black,
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Storage.themeState == 1 ? Colors.white : Colors.black,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
                   hintText: 'ابحث عن سورة أو صفحة أو آية',
                   hintStyle: TextStyle(
-                    color: Colors.white54,
+                    color:
+                        Storage.themeState == 1 ? Colors.white54 : Colors.black,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w400,
                     fontFamily: "Poppins",
                   ),
-                  suffixIcon:
-                      Icon(Icons.search, color: Colors.white, size: 24.w),
+                  suffixIcon: Icon(
+                    Icons.search,
+                    color: Storage.themeState == 1 ? Colors.white : bColor,
+                    size: 24.w,
+                  ),
                   prefixIcon: searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: Icon(Icons.clear,
-                              color: Colors.white, size: 24.w),
+                          icon: Icon(
+                            Icons.clear,
+                            color:
+                                Storage.themeState == 1 ? Colors.white : bColor,
+                            size: 24.w,
+                          ),
                           onPressed: () {
                             onClose();
                           },
@@ -70,7 +81,9 @@ class SurahScreen extends StatelessWidget {
                   fillColor: Colors.white.withOpacity(0.1),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: Storage.themeState == 1 ? Colors.white : bColor,
+                    ),
                   ),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
                 ),
@@ -120,7 +133,7 @@ class SurahScreen extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4.0),
           child: Card(
-            color: const Color(0xff121931),
+            color: Storage.themeState == 1 ? const Color(0xff121931) : bColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -176,7 +189,7 @@ class SurahScreen extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
           child: Card(
-            color: const Color(0xff121931),
+            color: Storage.themeState == 1 ? const Color(0xff121931) : bColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -226,7 +239,8 @@ class SurahScreen extends StatelessWidget {
             "${surahNumber <= 9 ? "00$surahNumber" : surahNumber <= 99 ? "0$surahNumber" : surahNumber}";
 
         return Card(
-          color: const Color(0xff121931),
+          color:
+              Storage.themeState == 1 ? const Color(0xff121931) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -244,13 +258,13 @@ class SurahScreen extends StatelessWidget {
               children: [
                 CustomText(
                   text: surahName,
-                  color: Colors.white,
+                  color: Storage.themeState == 1 ? Colors.white : bColor,
                   fontWeight: FontWeight.w500,
                   fontSize: isWidth ? 10 : 18,
                 ),
                 CustomText(
                   text: s,
-                  color: Colors.white,
+                  color: Storage.themeState == 1 ? Colors.white : bColor,
                   fontWeight: FontWeight.bold,
                   fontFamily: "SurahName",
                   fontSize: isWidth ? 15 : 30,
@@ -259,7 +273,9 @@ class SurahScreen extends StatelessWidget {
             ),
             subtitle: CustomText(
               text: "عدد آياتها $ayahCount",
-              color: Colors.white.withOpacity(.6),
+              color: Storage.themeState == 1
+                  ? Colors.white.withOpacity(.6)
+                  : Colors.black,
               fontFamily: "Hafs",
               fontWeight: FontWeight.w500,
               textAlign: TextAlign.right,
@@ -267,7 +283,7 @@ class SurahScreen extends StatelessWidget {
             ),
             trailing: CustomText(
               text: "$surahNumber",
-              color: Colors.white,
+              color: Storage.themeState == 1 ? Colors.white : bColor,
               fontWeight: FontWeight.w500,
               fontSize: isWidth ? 10 : 20,
             ),
