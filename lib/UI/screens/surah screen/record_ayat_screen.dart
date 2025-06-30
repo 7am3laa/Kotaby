@@ -5,6 +5,7 @@ import 'package:kotaby/core/services/quran_data_service.dart';
 import 'package:kotaby/core/services/uplaod_record_service.dart';
 import 'package:kotaby/core/ui_components/custom_app_bar.dart';
 import 'package:kotaby/main.dart';
+import 'package:kotaby/storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
@@ -53,6 +54,7 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
   static const String tashkeelPattern = r'[\u064B-\u065F\u0670\u06D6-\u06ED]';
 
   late Future<List<dynamic>?> _pageVersesFuture;
+  int? selectedWordIndex;
 
   @override
   void initState() {
@@ -284,19 +286,28 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
     return colors;
   }
 
-  List<TextSpan> _buildHighlightedWords(
+// ...existing code...
+  List<InlineSpan> _buildHighlightedWords(
     List<String> words,
     List<bool>? matches,
     bool isTargetVerse,
   ) {
+    // Determine base text color based on theme
+    final isDark = Storage.themeState == 1;
+    final baseColor = isDark ? Colors.white : Colors.black;
+    final targetColor = isTargetVerse
+        ? (isDark
+            ? Colors.white.withOpacity(0.5)
+            : Colors.black.withOpacity(0.5))
+        : baseColor;
+
     if (matches == null || matches.isEmpty || words.isEmpty) {
       return [
         for (int i = 0; i < words.length; i++) ...[
           TextSpan(
             text: words[i],
             style: TextStyle(
-              color:
-                  isTargetVerse ? Colors.yellow.withOpacity(0.7) : Colors.white,
+              color: targetColor,
               fontFamily: "MeQuran",
             ),
           ),
@@ -305,7 +316,7 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
       ];
     }
 
-    List<TextSpan> spans = [];
+    List<InlineSpan> spans = [];
 
     for (int i = 0; i < words.length; i++) {
       if (i < matches.length && matches[i] != null) {
@@ -325,7 +336,6 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
               i < transcribedWords.length ? transcribedWords[i] : '';
           String correctWord = words[i];
 
-          // Only do detailed comparison if we have user input
           if (userWord.isNotEmpty) {
             List<Color> charColors = _getCharacterColors(userWord, correctWord);
 
@@ -347,7 +357,6 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
               ));
             }
           } else {
-            // No user input for this word
             spans.add(TextSpan(
               text: words[i],
               style: TextStyle(
@@ -358,12 +367,10 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
           }
         }
       } else {
-        // No match data
         spans.add(TextSpan(
           text: words[i],
           style: TextStyle(
-            color:
-                isTargetVerse ? Colors.yellow.withOpacity(0.7) : Colors.white,
+            color: targetColor,
             fontFamily: "MeQuran",
           ),
         ));
@@ -380,7 +387,7 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Storage.themeState == 0 ? Colors.white : primaryColor,
       appBar: CustomAppBar(title: "تسميع الصفحة"),
       body: Center(
         child: Column(
@@ -446,6 +453,9 @@ class _RecordAyatScreenState extends State<RecordAyatScreen> {
                                   text:
                                       ' \u06DD${_toArabicNumerals(verse['ayaOrder'])} ',
                                   style: TextStyle(
+                                    color: Storage.themeState == 1
+                                        ? Colors.white
+                                        : Colors.black,
                                     fontSize: 24,
                                   ),
                                 ),
